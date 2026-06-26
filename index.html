@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World of Manga</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f0e4;
+  --rouge: #e8180c;
+  --or: #f0c030;
+  --bleu: #1a3a6b;
+  --gris: #e8e4d8;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif; overflow-x:hidden; cursor:crosshair; }
+body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(0,0,0,0.06) 1px,transparent 1px); background-size:8px 8px; pointer-events:none; z-index:0; }
+ 
+/* BANDEAU PROMO */
+.promo-bar { position:fixed; top:0; left:0; right:0; z-index:1100; background:var(--rouge); border-bottom:2px solid var(--or); height:36px; overflow:hidden; display:flex; align-items:center; }
+.promo-track { display:flex; align-items:center; animation:scrollPromo 28s linear infinite; white-space:nowrap; }
+.promo-bar:hover .promo-track { animation-play-state:paused; }
+@keyframes scrollPromo { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.promo-item { font-family:'Bangers',cursive; font-size:.85rem; letter-spacing:3px; color:white; padding:0 2rem; display:flex; align-items:center; gap:8px; }
+.promo-sep { color:var(--or); font-size:1rem; padding:0 .5rem; }
+ 
+/* WHATSAPP */
+.wa-float { position:fixed; bottom:2rem; right:1.5rem; z-index:3000; width:58px; height:58px; background:#25D366; border:3px solid var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-shadow:4px 4px 0 var(--ink); transition:transform .2s,box-shadow .2s; animation:waPulse 2.5s ease-in-out infinite; text-decoration:none; }
+.wa-float:hover { transform:translate(-2px,-2px) scale(1.05); box-shadow:6px 6px 0 var(--ink); animation:none; }
+@keyframes waPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+.wa-bubble { position:fixed; bottom:5.5rem; right:1.5rem; z-index:3000; background:var(--ink); color:var(--paper); font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:2px; padding:6px 12px; border:2px solid var(--or); white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s; box-shadow:3px 3px 0 var(--rouge); }
+.wa-float:hover + .wa-bubble { opacity:1; }
+ 
+/* COUNTDOWN */
+.countdown-banner { position:relative; z-index:1; background:var(--bleu); border-bottom:4px solid var(--ink); padding:.8rem 4%; display:flex; align-items:center; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
+.cd-label { font-family:'Bangers',cursive; font-size:1rem; letter-spacing:3px; color:var(--or); white-space:nowrap; }
+.cd-label span { color:white; }
+.cd-blocks { display:flex; gap:.5rem; align-items:center; }
+.cd-block { background:var(--ink); border:2px solid var(--or); padding:4px 10px; text-align:center; min-width:52px; }
+.cd-num { font-family:'Bangers',cursive; font-size:1.4rem; color:var(--or); letter-spacing:2px; line-height:1; display:block; }
+.cd-unit { font-size:.55rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.5); display:block; }
+.cd-sep { font-family:'Bangers',cursive; font-size:1.4rem; color:var(--rouge); }
+.cd-close { position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:1px solid rgba(255,255,255,.3); color:rgba(255,255,255,.5); cursor:pointer; font-size:.75rem; padding:2px 7px; }
+ 
+/* NAVBAR */
+nav { position:fixed; top:36px; left:0; right:0; z-index:1000; background:var(--ink); height:64px; padding:0 4%; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 0 var(--rouge); }
+.nav-logo img { height: 120px; width: auto; filter: drop-shadow(2px 2px 0 var(--rouge));}
+.nav-links { display:flex; gap:0; list-style:none; }
+.nav-links a { color:var(--paper); text-decoration:none; font-family:'Bangers',cursive; font-size:1.1rem; letter-spacing:2px; padding:0 1.2rem; height:64px; display:flex; align-items:center; border-left:2px solid rgba(255,255,255,.1); transition:background .15s; }
+.nav-links a:hover { background:var(--rouge); }
+.nav-right { display:flex; align-items:center; gap:1rem; }
+.cart-btn { background:var(--rouge); border:3px solid var(--paper); color:white; font-family:'Bangers',cursive; font-size:1rem; letter-spacing:2px; padding:6px 18px; cursor:pointer; display:flex; align-items:center; gap:8px; box-shadow:3px 3px 0 var(--paper); }
+.cart-num { background:var(--or); color:var(--ink); font-size:.75rem; font-weight:900; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.hamburger { display:none; background:none; border:2px solid rgba(255,255,255,.3); color:white; font-size:1.2rem; cursor:pointer; padding:4px 10px; }
+.mobile-menu { display:none; position:fixed; top:100px; left:0; right:0; background:var(--ink); border-bottom:4px solid var(--rouge); z-index:900; flex-direction:column; }
+.mobile-menu.open { display:flex; }
+.mobile-menu a { color:var(--paper); text-decoration:none; font-family:'Bangers',cursive; font-size:1.1rem; letter-spacing:3px; padding:1rem 5%; border-bottom:2px solid rgba(255,255,255,.08); }
+.mobile-menu a:hover { background:var(--rouge); }
+ 
+/* INTRO */
+#intro-screen { position:fixed; inset:0; z-index:9999; background:var(--ink); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.speed-lines { position:absolute; inset:0; overflow:hidden; }
+.speed-lines svg { width:100%; height:100%; }
+.intro-content { position:relative; z-index:2; text-align:center; animation:introZoom .5s ease .3s both; }
+@keyframes introZoom { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+.intro-sfx { font-family:'Bangers',cursive; font-size:clamp(5rem,18vw,13rem); color:var(--or); line-height:.85; text-shadow:6px 6px 0 var(--rouge),12px 12px 0 rgba(0,0,0,.3); animation:sfxShake .3s ease .8s both; display:block; letter-spacing:4px; }
+@keyframes sfxShake { 0%,100%{transform:rotate(-2deg)} 25%{transform:rotate(3deg) scale(1.05)} 75%{transform:rotate(-1deg) scale(.98)} }
+.intro-sub { font-family:'Bangers',cursive; font-size:clamp(1.2rem,4vw,2.2rem); color:white; letter-spacing:6px; margin-top:1rem; animation:fadeIn .5s ease 1.1s both; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.intro-skip { margin-top:3rem; background:none; border:2px solid rgba(255,255,255,.4); color:rgba(255,255,255,.6); font-family:'Inter',sans-serif; font-size:.8rem; letter-spacing:3px; text-transform:uppercase; padding:8px 20px; cursor:pointer; transition:all .2s; animation:fadeIn .5s ease 1.8s both; }
+ 
+/* HERO */
+.hero { padding-top:100px; min-height:100vh; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:60vh 40vh; position:relative; z-index:1; }
+.panel { border:4px solid var(--ink); position:relative; overflow:hidden; display:flex; align-items:flex-end; justify-content:flex-start; padding:1.5rem; }
+.panel-1 { grid-column:1; grid-row:1; background:var(--ink); flex-direction:column; align-items:flex-start; justify-content:center; padding:2.5rem; }
+.panel-1::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg,transparent,transparent 6px,rgba(255,255,255,.03) 6px,rgba(255,255,255,.03) 7px); }
+.panel-tag { font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:4px; color:var(--or); border:2px solid var(--or); padding:3px 10px; margin-bottom:1rem; display:inline-block; }
+.panel-1 h1 { font-family:'Bangers',cursive; font-size:clamp(3rem,6vw,5.5rem); color:#fff; line-height:.9; letter-spacing:3px; position:relative; z-index:1; }
+.panel-1 h1 em { color:var(--rouge); font-style:normal; display:block; }
+.panel-1 p { color:rgba(245,240,228,.65); font-size:.9rem; margin-top:1.2rem; max-width:320px; line-height:1.6; position:relative; z-index:1; }
+.panel-1-btns { display:flex; gap:.8rem; margin-top:2rem; position:relative; z-index:1; flex-wrap:wrap; }
+.panel-2 { grid-column:2; grid-row:1; background:var(--paper); align-items:center; justify-content:center; flex-direction:column; position:relative; }
+.panel-2::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(0,0,0,.08) 1.5px,transparent 1.5px); background-size:12px 12px; }
+.panel-2 img { width:75%; max-width:380px; height:auto; position:relative; z-index:1; filter:drop-shadow(4px 4px 0 var(--rouge)) drop-shadow(-2px -2px 0 var(--bleu)); animation:logoFloat 3s ease-in-out infinite; }
+@keyframes logoFloat { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-12px) rotate(1deg)} }
+.sfx-boum { position:absolute; font-family:'Bangers',cursive; color:var(--or); pointer-events:none; z-index:2; text-shadow:2px 2px 0 var(--ink); }
+.sfx-boum.s1 { font-size:2.5rem; top:10%; left:5%; transform:rotate(-15deg); }
+.sfx-boum.s2 { font-size:1.8rem; bottom:20%; right:8%; transform:rotate(10deg); color:var(--rouge); }
+.sfx-boum.s3 { font-size:1.4rem; top:55%; left:10%; transform:rotate(-5deg); color:var(--bleu); }
+.panel-3 { grid-column:1; grid-row:2; background:var(--rouge); gap:0; padding:0; display:grid; grid-template-columns:1fr 1fr 1fr; }
+.stat-block { border-right:3px solid var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1rem; text-align:center; }
+.stat-block:last-child { border-right:none; }
+.stat-num { font-family:'Bangers',cursive; font-size:2.5rem; color:var(--or); text-shadow:2px 2px 0 var(--ink); line-height:1; }
+.stat-label { font-size:.65rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:white; margin-top:4px; }
+.panel-4 { grid-column:2; grid-row:2; background:var(--or); flex-direction:column; align-items:flex-start; justify-content:center; gap:.4rem; }
+.panel-4 .tag { font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:3px; background:var(--ink); color:var(--or); padding:2px 8px; display:inline-block; }
+.panel-4 p { font-family:'Bangers',cursive; font-size:clamp(1.3rem,3vw,2rem); color:var(--ink); letter-spacing:1px; line-height:1.1; }
+ 
+/* BOUTONS */
+.btn-manga { font-family:'Bangers',cursive; font-size:1rem; letter-spacing:3px; padding:10px 24px; border:3px solid var(--ink); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:transform .15s,box-shadow .15s; box-shadow:4px 4px 0 rgba(0,0,0,.5); }
+.btn-manga:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 rgba(0,0,0,.5); }
+.btn-rouge { background:var(--rouge); color:white; }
+.btn-or { background:var(--or); color:var(--ink); }
+.btn-ink { background:var(--ink); color:var(--paper); }
+.btn-paper { background:var(--paper); color:var(--ink); }
+ 
+/* FILTRES */
+.cat-section { position:relative; z-index:1; background:var(--ink); padding:0 0 28px 0; border-bottom:4px solid var(--rouge); }
+.cat-head { padding:18px 4% 14px; display:flex; align-items:center; gap:10px; }
+.cat-head-line { width:3px; height:22px; background:var(--rouge); }
+.cat-label { font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:5px; color:var(--or); }
+.cat-filters { display:grid; grid-template-columns:repeat(7,1fr); padding:0 4%; }
+.cat-filter { display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 8px 12px; border:none; background:transparent; cursor:pointer; transition:all .18s; position:relative; }
+.cat-filter::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:0; height:3px; background:var(--rouge); transition:width .2s; }
+.cat-filter:hover::after, .cat-filter.active::after { width:60%; }
+.cat-filter:hover, .cat-filter.active { background:rgba(232,24,12,.08); }
+.cat-icon-wrap { width:52px; height:52px; background:#1a1a1a; border:2px solid #2a2a2a; display:flex; align-items:center; justify-content:center; font-size:1.5rem; transition:all .18s; }
+.cat-filter:hover .cat-icon-wrap { border-color:var(--rouge); }
+.cat-filter.active .cat-icon-wrap { background:var(--rouge); border-color:var(--rouge); }
+.cat-name { font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:2px; color:rgba(245,240,228,.5); text-transform:uppercase; text-align:center; }
+.cat-filter:hover .cat-name { color:rgba(245,240,228,.9); }
+.cat-filter.active .cat-name { color:var(--or); }
+ 
+/* PRODUITS */
+.products-section { position:relative; z-index:1; background:var(--paper); }
+.chapter-header { background:var(--ink); border-bottom:4px solid var(--rouge); padding:1.5rem 4%; display:flex; align-items:baseline; gap:1.5rem; }
+.chapter-num { font-family:'Bangers',cursive; font-size:1rem; color:var(--or); letter-spacing:4px; border:2px solid var(--or); padding:2px 10px; }
+.chapter-title { font-family:'Bangers',cursive; font-size:clamp(1.8rem,4vw,3rem); color:var(--paper); letter-spacing:3px; }
+.chapter-title em { color:var(--rouge); font-style:normal; }
+.product-grid { display:grid; grid-template-columns:repeat(3,1fr); border-left:4px solid var(--ink); border-top:4px solid var(--ink); }
+.pcard { border-right:4px solid var(--ink); border-bottom:4px solid var(--ink); background:var(--gris); cursor:pointer; position:relative; display:flex; flex-direction:column; overflow:hidden; transition:box-shadow .2s; }
+.pcard:hover { box-shadow:inset 0 0 0 4px var(--rouge); z-index:5; }
+.pcard-visual { width:100%; height:340px; position:relative; overflow:hidden; background:var(--gris); flex-shrink:0; }
+.pcard-img { width:100%; height:100%; object-fit:contain; display:block; padding:8px; background:#fff; transition:transform .4s; }
+.pcard:hover .pcard-img { transform:scale(1.04); }
+.pcard-emoji-wrap { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:6rem; background:linear-gradient(145deg,#f0ece0,#e0dcc8); transition:transform .3s; }
+.pcard:hover .pcard-emoji-wrap { transform:scale(1.1) rotate(-3deg); }
+.pcard-badge { position:absolute; top:10px; left:10px; font-family:'Bangers',cursive; font-size:.72rem; letter-spacing:2px; background:var(--rouge); color:white; padding:3px 10px; z-index:3; border:2px solid var(--ink); }
+.pcard-info { background:var(--ink); padding:10px 14px 6px; border-top:3px solid var(--rouge); flex-shrink:0; }
+.pcard-top-row { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:3px; }
+.pcard-name { font-family:'Bangers',cursive; font-size:1rem; color:var(--paper); letter-spacing:1px; line-height:1.1; flex:1; padding-right:8px; }
+.pcard-price { font-family:'Bangers',cursive; font-size:1.1rem; color:var(--or); white-space:nowrap; }
+.pcard-series-row { display:flex; justify-content:space-between; align-items:center; }
+.pcard-series { font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,228,.4); }
+.pcard-options-hint { font-size:.6rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--or); opacity:.8; }
+.pcard-hover-fx { position:absolute; inset:0; z-index:4; pointer-events:none; opacity:0; transition:opacity .2s; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.7rem; background:rgba(13,13,13,.8); backdrop-filter:blur(3px); }
+.pcard:hover .pcard-hover-fx { opacity:1; }
+.pcard-hover-fx .sfx { font-family:'Bangers',cursive; font-size:2.4rem; color:var(--or); letter-spacing:4px; text-shadow:3px 3px 0 var(--rouge); animation:sfxPop .2s ease; }
+@keyframes sfxPop { from{transform:scale(.5) rotate(-10deg)} to{transform:scale(1) rotate(0)} }
+.pcard-hover-fx .price-big { font-family:'Bangers',cursive; font-size:1.6rem; color:white; }
+.pcard-hover-fx .choose-btn { background:var(--rouge); color:white; border:2px solid white; font-family:'Bangers',cursive; font-size:1rem; letter-spacing:3px; padding:8px 28px; cursor:pointer; pointer-events:all; box-shadow:3px 3px 0 rgba(0,0,0,.4); }
+ 
+/* PERSONNALISATION */
+.perso-section { position:relative; z-index:1; background:var(--ink); border-top:4px solid var(--or); border-bottom:4px solid var(--rouge); padding:3rem 4%; overflow:hidden; }
+.perso-section::before { content:'CUSTOM!!'; position:absolute; right:-2rem; top:50%; transform:translateY(-50%); font-family:'Bangers',cursive; font-size:10rem; color:rgba(240,192,48,.04); letter-spacing:8px; pointer-events:none; white-space:nowrap; }
+.perso-badge { font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:4px; background:var(--or); color:var(--ink); padding:3px 12px; border:2px solid var(--ink); display:inline-block; margin-bottom:.8rem; }
+.perso-section h2 { font-family:'Bangers',cursive; font-size:clamp(2rem,5vw,3.5rem); color:white; letter-spacing:3px; line-height:1; margin-bottom:.4rem; }
+.perso-section h2 em { color:var(--rouge); font-style:normal; }
+.perso-section > p { color:rgba(245,240,228,.5); font-size:.85rem; margin-bottom:2rem; }
+.perso-types { display:grid; grid-template-columns:repeat(4,1fr); border:3px solid #222; margin-bottom:2rem; }
+.perso-type-btn { background:#111; border:none; border-right:3px solid #222; padding:1.2rem 1rem; cursor:pointer; text-align:center; transition:all .18s; }
+.perso-type-btn:last-child { border-right:none; }
+.perso-type-btn:hover, .perso-type-btn.active { background:var(--rouge); }
+.pt-img { width:60px; height:60px; object-fit:contain; display:block; margin:0 auto 6px; filter:brightness(0) invert(1); opacity:.7; transition:opacity .2s; }
+.perso-type-btn:hover .pt-img, .perso-type-btn.active .pt-img { opacity:1; filter:brightness(0) invert(1) drop-shadow(0 0 6px var(--or)); }
+.pt-name { font-family:'Bangers',cursive; font-size:.85rem; letter-spacing:2px; color:white; display:block; }
+.pt-price { font-family:'Bangers',cursive; font-size:.7rem; letter-spacing:1px; color:var(--or); margin-top:2px; display:block; }
+.perso-config { display:grid; grid-template-columns:1fr 1fr; gap:2rem; background:#111; border:3px solid #222; padding:1.5rem; }
+.cfg-label { font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:4px; color:var(--or); display:flex; align-items:center; gap:8px; border-bottom:2px solid #222; padding-bottom:6px; margin-bottom:.7rem; }
+.cfg-block { margin-bottom:1.5rem; }
+.size-chips { display:flex; gap:.4rem; flex-wrap:wrap; }
+.size-chip { font-family:'Bangers',cursive; font-size:.9rem; letter-spacing:2px; padding:7px 16px; border:2px solid #333; background:#1a1a1a; color:rgba(245,240,228,.6); cursor:pointer; transition:all .15s; }
+.size-chip:hover { border-color:var(--or); color:var(--or); }
+.size-chip.selected { background:var(--or); color:var(--ink); border-color:var(--or); }
+.color-row { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:6px; }
+.cfg-color { width:38px; height:38px; border:3px solid #333; cursor:pointer; position:relative; transition:transform .15s,box-shadow .15s; display:flex; align-items:center; justify-content:center; }
+.cfg-color:hover { transform:scale(1.15); }
+.cfg-color.selected { box-shadow:0 0 0 3px var(--or); transform:scale(1.15); }
+.cfg-color.selected::after { content:'✓'; color:white; font-size:.9rem; font-weight:900; text-shadow:1px 1px 0 #000; position:absolute; }
+.cfg-color[data-c="Noir"] { background:#111; }
+.cfg-color[data-c="Blanc"] { background:#fff; }
+.cfg-color[data-c="Rouge"] { background:#e8180c; }
+.cfg-color[data-c="Bleu Marine"] { background:#1a3a6b; }
+.cfg-color[data-c="Vert"] { background:#2d6a2d; }
+.cfg-color[data-c="Gris"] { background:#666; }
+.color-name-tag { font-family:'Bangers',cursive; font-size:.7rem; letter-spacing:2px; color:rgba(245,240,228,.4); }
+.technique-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+.tech-opt { background:#1a1a1a; border:2px solid #333; padding:12px; cursor:pointer; text-align:center; transition:all .15s; }
+.tech-opt:hover { border-color:var(--bleu); }
+.tech-opt.selected { background:var(--bleu); border-color:var(--or); }
+.t-icon { font-size:1.6rem; display:block; margin-bottom:4px; }
+.t-name { font-family:'Bangers',cursive; font-size:.85rem; letter-spacing:2px; color:white; display:block; }
+.t-desc { font-size:.65rem; color:rgba(255,255,255,.4); letter-spacing:1px; margin-top:2px; display:block; }
+.upload-tabs { display:flex; margin-bottom:.8rem; }
+.upload-tab { font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:2px; padding:6px 16px; border:2px solid #333; background:#1a1a1a; color:rgba(245,240,228,.5); cursor:pointer; transition:all .15s; }
+.upload-tab:first-child { border-right:none; }
+.upload-tab.active { background:var(--rouge); color:white; border-color:var(--rouge); }
+.upload-zone { border:3px dashed #333; background:#0d0d0d; padding:1.5rem; text-align:center; cursor:pointer; transition:border-color .2s; position:relative; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.4rem; }
+.upload-zone:hover { border-color:var(--or); }
+.upload-zone.has-file { border-color:var(--rouge); border-style:solid; }
+.uz-icon { font-size:2rem; }
+.uz-label { font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:2px; color:rgba(245,240,228,.4); }
+.uz-sub { font-size:.65rem; color:rgba(245,240,228,.25); letter-spacing:1px; }
+.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-preview { max-width:100%; max-height:100px; object-fit:contain; border:2px solid var(--rouge); margin-top:.5rem; display:none; }
+.upload-preview.show { display:block; }
+.upload-fname { font-size:.65rem; color:var(--or); font-family:'Bangers',cursive; letter-spacing:1px; margin-top:4px; }
+.perso-note { width:100%; background:#0d0d0d; border:2px solid #333; color:var(--paper); padding:10px 14px; font-family:'Inter',sans-serif; font-size:.85rem; outline:none; resize:vertical; min-height:70px; transition:border-color .2s; }
+.perso-note:focus { border-color:var(--or); }
+.perso-note::placeholder { color:rgba(245,240,228,.25); }
+.garment-preview { background:#1a1a1a; border:3px solid #222; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:380px; position:relative; overflow:hidden; padding:1rem; }
+.garment-preview::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,.03) 1px,transparent 1px); background-size:10px 10px; pointer-events:none; }
+.mockup-container { position:relative; width:100%; max-width:280px; display:flex; align-items:center; justify-content:center; margin-bottom:.8rem; }
+.preview-side-toggle { display:flex; margin-bottom:1rem; }
+.pst-btn { font-family:'Bangers',cursive; font-size:.7rem; letter-spacing:2px; padding:5px 14px; border:2px solid #333; background:#111; color:rgba(245,240,228,.4); cursor:pointer; transition:all .15s; }
+.pst-btn:first-child { border-right:none; }
+.pst-btn.active { background:var(--rouge); color:white; border-color:var(--rouge); }
+.preview-label { font-family:'Bangers',cursive; font-size:.7rem; letter-spacing:3px; color:rgba(245,240,228,.3); text-align:center; margin-top:.5rem; }
+.perso-recap-box { margin-top:1rem; background:#0d0d0d; border:2px solid #222; padding:1rem; }
+.perso-recap-content { font-size:.75rem; color:rgba(245,240,228,.5); line-height:2; font-family:'Bangers',cursive; letter-spacing:1px; }
+.perso-error { color:var(--rouge); font-family:'Bangers',cursive; font-size:.85rem; letter-spacing:2px; margin-bottom:.8rem; min-height:1.2em; }
+.perso-cta { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-top:1.5rem; }
+.perso-price-tag { font-family:'Bangers',cursive; font-size:1.6rem; color:var(--or); letter-spacing:2px; }
+.perso-price-tag small { font-size:.8rem; color:rgba(245,240,228,.4); letter-spacing:1px; display:block; }
+ 
+/* MODAL OPTIONS */
+.opt-modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:4000; display:flex; align-items:center; justify-content:center; padding:1.5rem; opacity:0; pointer-events:none; transition:opacity .3s; }
+.opt-modal-bg.open { opacity:1; pointer-events:all; }
+.opt-modal { background:var(--paper); border:4px solid var(--ink); box-shadow:8px 8px 0 var(--rouge); width:100%; max-width:500px; max-height:90vh; overflow-y:auto; transform:scale(.93) rotate(-1deg); transition:transform .3s; }
+.opt-modal-bg.open .opt-modal { transform:scale(1) rotate(0); }
+.opt-head { background:var(--ink); border-bottom:4px solid var(--rouge); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.opt-head h3 { font-family:'Bangers',cursive; font-size:1.4rem; letter-spacing:3px; color:var(--or); }
+.opt-head button { background:none; border:2px solid rgba(255,255,255,.3); color:white; font-size:1.1rem; cursor:pointer; padding:1px 7px; }
+.opt-body { padding:1.5rem; }
+.opt-preview { display:flex; gap:1rem; align-items:center; background:var(--gris); border:3px solid var(--ink); padding:1rem; margin-bottom:1.5rem; }
+.opt-preview-img { width:80px; height:90px; object-fit:cover; border:2px solid var(--ink); flex-shrink:0; }
+.opt-preview-emoji { width:80px; height:90px; display:flex; align-items:center; justify-content:center; font-size:3rem; background:white; border:2px solid var(--ink); flex-shrink:0; }
+.opt-preview-info h4 { font-family:'Bangers',cursive; font-size:1.2rem; letter-spacing:2px; color:var(--ink); }
+.opt-preview-info .opt-price { font-family:'Bangers',cursive; font-size:1.4rem; color:var(--rouge); }
+.opt-preview-info .opt-series { font-size:.7rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(0,0,0,.4); }
+.opt-section { margin-bottom:1.2rem; }
+.opt-section-label { font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:3px; color:var(--bleu); margin-bottom:.6rem; display:block; }
+.opt-chips { display:flex; gap:.5rem; flex-wrap:wrap; }
+.opt-chip { font-family:'Bangers',cursive; font-size:.85rem; letter-spacing:2px; padding:6px 14px; border:2px solid var(--ink); background:white; cursor:pointer; transition:all .15s; }
+.opt-chip:hover { background:var(--gris); }
+.opt-chip.selected { background:var(--ink); color:var(--or); border-color:var(--rouge); }
+.color-chips { display:flex; gap:.6rem; flex-wrap:wrap; }
+.color-chip { width:36px; height:36px; border:3px solid var(--ink); cursor:pointer; position:relative; transition:transform .15s,box-shadow .15s; display:flex; align-items:center; justify-content:center; }
+.color-chip:hover { transform:scale(1.15); }
+.color-chip.selected { box-shadow:0 0 0 3px var(--rouge); transform:scale(1.15); }
+.color-chip.selected::after { content:'✓'; position:absolute; color:white; font-size:.9rem; font-weight:900; text-shadow:1px 1px 0 #000; }
+.color-chip[data-color="Noir"] { background:#111; }
+.color-chip[data-color="Blanc"] { background:#fff; }
+.color-chip[data-color="Rouge"] { background:#e8180c; }
+.opt-error { color:var(--rouge); font-family:'Bangers',cursive; font-size:.9rem; letter-spacing:2px; margin-bottom:.8rem; min-height:1.2em; }
+ 
+/* LIVRAISON */
+.delivery-banner { position:relative; z-index:1; background:var(--bleu); border-top:4px solid var(--ink); border-bottom:4px solid var(--ink); padding:1.5rem 4%; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:1rem; }
+.delivery-item { display:flex; align-items:center; gap:.8rem; color:white; }
+.delivery-icon { font-size:2rem; }
+.delivery-text strong { display:block; font-family:'Bangers',cursive; font-size:1.1rem; letter-spacing:2px; color:var(--or); }
+.delivery-text span { font-size:.75rem; color:rgba(255,255,255,.7); }
+ 
+/* NEWSLETTER */
+.nl-section { position:relative; z-index:1; background:var(--or); border-bottom:4px solid var(--ink); padding:3rem 4%; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center; }
+.nl-left h2 { font-family:'Bangers',cursive; font-size:clamp(2rem,5vw,4rem); color:var(--ink); letter-spacing:3px; line-height:.9; }
+.nl-left h2 em { color:var(--rouge); font-style:normal; display:block; }
+.nl-left p { margin-top:.8rem; font-size:.85rem; font-weight:600; color:rgba(0,0,0,.6); }
+.nl-form { display:flex; flex-direction:column; gap:.8rem; }
+.nl-form input { background:var(--ink); border:3px solid var(--ink); color:var(--paper); padding:12px 16px; font-size:.9rem; font-family:'Inter',sans-serif; outline:none; }
+.nl-form input::placeholder { color:rgba(245,240,228,.4); }
+#nl-msg { font-family:'Bangers',cursive; font-size:1rem; letter-spacing:2px; color:var(--rouge); min-height:1.4em; }
+ 
+/* FOOTER */
+footer { position:relative; z-index:1; background:var(--ink); border-top:4px solid var(--rouge); padding:3rem 4% 2rem; }
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:2rem; margin-bottom:2rem; }
+.footer-brand img { height: 120px; filter: drop-shadow(2px 2px 0 var(--rouge));margin-bottom: 1rem; display: block; }
+.footer-brand p { color:rgba(245,240,228,.5); font-size:.8rem; line-height:1.7; max-width:240px; }
+.footer-col h4 { font-family:'Bangers',cursive; font-size:.9rem; letter-spacing:3px; color:var(--or); margin-bottom:1rem; border-bottom:2px solid rgba(240,192,48,.3); padding-bottom:.5rem; }
+.footer-col ul { list-style:none; }
+.footer-col li { margin-bottom:.6rem; }
+.footer-col a { color:rgba(245,240,228,.5); text-decoration:none; font-size:.8rem; }
+.footer-col a:hover { color:var(--paper); }
+.footer-bottom { border-top:2px solid rgba(255,255,255,.08); padding-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+.footer-bottom p { color:rgba(245,240,228,.3); font-size:.75rem; }
+.social-row { display:flex; gap:.8rem; }
+.social-row a { font-size:1.3rem; text-decoration:none; }
+ 
+/* PANIER */
+.cart-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000; opacity:0; pointer-events:none; transition:opacity .3s; }
+.cart-overlay.open { opacity:1; pointer-events:all; }
+.cart-sidebar { position:fixed; top:0; right:-460px; width:420px; max-width:100vw; height:100vh; background:var(--paper); border-left:4px solid var(--ink); z-index:2100; display:flex; flex-direction:column; transition:right .35s cubic-bezier(.4,0,.2,1); }
+.cart-sidebar.open { right:0; }
+.cart-head { background:var(--ink); border-bottom:4px solid var(--rouge); padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.cart-head h3 { font-family:'Bangers',cursive; color:var(--or); font-size:1.4rem; letter-spacing:3px; }
+.cart-head button { background:none; border:2px solid rgba(255,255,255,.3); color:white; font-size:1.2rem; cursor:pointer; padding:2px 8px; }
+.cart-body { flex:1; overflow-y:auto; padding:1.2rem; }
+.cart-empty { text-align:center; padding:3rem 0; color:rgba(0,0,0,.4); }
+.cart-empty .big { font-size:3rem; margin-bottom:.5rem; display:block; }
+.cart-empty p { font-family:'Bangers',cursive; letter-spacing:2px; }
+.cart-item { display:flex; gap:.8rem; align-items:flex-start; padding:.8rem 0; border-bottom:2px solid rgba(0,0,0,.1); }
+.ci-thumb { width:55px; height:65px; background:var(--gris); border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; overflow:hidden; }
+.ci-thumb img { width:100%; height:100%; object-fit:cover; }
+.ci-info { flex:1; }
+.ci-name { font-family:'Bangers',cursive; font-size:.9rem; letter-spacing:1px; color:var(--ink); line-height:1.2; }
+.ci-opts { font-size:.7rem; color:rgba(0,0,0,.5); font-weight:600; margin-top:2px; }
+.ci-price { color:var(--rouge); font-weight:700; font-size:.85rem; margin-top:2px; }
+.ci-qty { display:flex; align-items:center; gap:6px; margin-top:4px; }
+.ci-qty button { background:var(--ink); border:none; color:var(--paper); width:22px; height:22px; cursor:pointer; font-size:.9rem; }
+.ci-qty button:hover { background:var(--rouge); }
+.ci-qty span { font-size:.85rem; min-width:18px; text-align:center; font-weight:700; }
+.ci-del { background:none; border:none; font-size:1rem; cursor:pointer; color:rgba(0,0,0,.4); }
+.ci-del:hover { color:var(--rouge); }
+.cart-foot { background:var(--ink); border-top:4px solid var(--ink); padding:1.2rem 1.5rem; display:none; }
+.cart-total-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+.cart-total-row span:first-child { font-family:'Bangers',cursive; color:rgba(255,255,255,.6); letter-spacing:2px; }
+.cart-total-row .big-price { font-family:'Bangers',cursive; font-size:1.6rem; color:var(--or); }
+ 
+/* MODALS */
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:3000; display:flex; align-items:center; justify-content:center; padding:1.5rem; opacity:0; pointer-events:none; transition:opacity .3s; }
+.modal-bg.open { opacity:1; pointer-events:all; }
+.modal-box { background:var(--paper); border:4px solid var(--ink); box-shadow:8px 8px 0 var(--rouge); width:100%; max-width:540px; max-height:90vh; overflow-y:auto; transform:scale(.93) rotate(-1deg); transition:transform .3s; }
+.modal-bg.open .modal-box { transform:scale(1) rotate(0); }
+.modal-head { background:var(--ink); border-bottom:4px solid var(--rouge); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.modal-head h3 { font-family:'Bangers',cursive; font-size:1.4rem; letter-spacing:3px; color:var(--or); }
+.modal-head button { background:none; border:2px solid rgba(255,255,255,.3); color:white; font-size:1.1rem; cursor:pointer; padding:1px 7px; }
+.modal-body { padding:1.5rem; }
+.field-label { display:block; font-family:'Bangers',cursive; font-size:.75rem; letter-spacing:3px; color:var(--bleu); margin-bottom:4px; }
+.modal-input { width:100%; background:white; border:3px solid var(--ink); color:var(--ink); padding:10px 14px; font-family:'Inter',sans-serif; font-size:.9rem; outline:none; margin-bottom:1rem; }
+.modal-input:focus { border-color:var(--rouge); }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.order-summary { background:var(--gris); border:3px solid var(--ink); padding:1rem; margin:1rem 0; }
+.order-summary h4 { font-family:'Bangers',cursive; font-size:.8rem; letter-spacing:3px; color:rgba(0,0,0,.5); margin-bottom:.6rem; }
+.sum-line { display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:4px; color:rgba(0,0,0,.7); }
+.sum-total { display:flex; justify-content:space-between; border-top:2px solid var(--ink); padding-top:6px; margin-top:6px; font-family:'Bangers',cursive; font-size:1.1rem; color:var(--rouge); }
+.payment-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin:1rem 0; }
+.pay-opt { border:3px solid var(--ink); background:white; padding:12px; cursor:pointer; text-align:center; transition:all .15s; font-family:'Bangers',cursive; }
+.pay-opt:hover { background:var(--gris); }
+.pay-opt.selected { background:var(--ink); color:var(--or); border-color:var(--rouge); }
+.pay-opt .p-icon { font-size:1.4rem; display:block; margin-bottom:2px; }
+.pay-opt .p-name { font-size:.75rem; letter-spacing:2px; }
+.pay-opt{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.pay-logo{
+    width:55px;
+    height:55px;
+    object-fit:contain;
+}
+
+.p-name{
+    font-weight:700;
+    text-align:center;
+}
+.success-box { text-align:center; padding:2.5rem 1.5rem; }
+.success-sfx { font-family:'Bangers',cursive; font-size:4rem; color:var(--rouge); text-shadow:4px 4px 0 var(--or),8px 8px 0 var(--ink); letter-spacing:4px; display:block; margin-bottom:.5rem; animation:sfxPop .4s ease; }
+.success-box p { font-size:.85rem; color:rgba(0,0,0,.6); line-height:1.7; }
+ 
+/* RESPONSIVE */
+@media(max-width:900px){
+  .nav-links { display:none; }
+  .hamburger { display:block; }
+  .hero { grid-template-columns:1fr; grid-template-rows:auto auto auto auto; }
+  .panel-1,.panel-2,.panel-3,.panel-4 { grid-column:1; grid-row:auto; }
+  .panel-2 { min-height:260px; }
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .nl-section { grid-template-columns:1fr; }
+  .product-grid { grid-template-columns:repeat(2,1fr); }
+  .pcard-visual { height:240px; }
+  .cat-filters { grid-template-columns:repeat(4,1fr); }
+  .perso-types { grid-template-columns:repeat(2,1fr); }
+  .perso-config { grid-template-columns:1fr; }
+}
+@media(max-width:480px){
+  .footer-grid { grid-template-columns:1fr; }
+  .payment-grid,.two-col { grid-template-columns:1fr; }
+  .product-grid { grid-template-columns:1fr; }
+  .cat-filters { grid-template-columns:repeat(4,1fr); }
+  .perso-types { grid-template-columns:repeat(2,1fr); }
+  .technique-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+ 
+<!-- INTRO -->
+<div id="intro-screen">
+  <div class="speed-lines">
+    <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="rg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#111"/><stop offset="100%" stop-color="#0d0d0d"/></radialGradient></defs>
+      <rect width="1200" height="800" fill="url(#rg)"/>
+      <g stroke="rgba(240,192,48,0.15)" stroke-width="1">
+        <line x1="600" y1="400" x2="0" y2="0"/><line x1="600" y1="400" x2="200" y2="0"/><line x1="600" y1="400" x2="400" y2="0"/>
+        <line x1="600" y1="400" x2="600" y2="0"/><line x1="600" y1="400" x2="800" y2="0"/><line x1="600" y1="400" x2="1000" y2="0"/>
+        <line x1="600" y1="400" x2="1200" y2="0"/><line x1="600" y1="400" x2="1200" y2="400"/><line x1="600" y1="400" x2="1200" y2="800"/>
+        <line x1="600" y1="400" x2="800" y2="800"/><line x1="600" y1="400" x2="600" y2="800"/><line x1="600" y1="400" x2="400" y2="800"/>
+        <line x1="600" y1="400" x2="0" y2="800"/><line x1="600" y1="400" x2="0" y2="400"/><line x1="600" y1="400" x2="0" y2="200"/>
+      </g>
+      <circle cx="600" cy="400" r="80" fill="none" stroke="rgba(232,24,12,0.2)" stroke-width="2"/>
+      <circle cx="600" cy="400" r="160" fill="none" stroke="rgba(232,24,12,0.12)" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="intro-content">
+    <span class="intro-sfx">World of<br>Manga!!</span>
+    <p class="intro-sub">COLLECTION 2026</p>
+    <button class="intro-skip" onclick="skipIntro()">Passer l'intro ▶</button>
+  </div>
+</div>
+ 
+<!-- BANDEAU PROMO -->
+<div class="promo-bar"><div class="promo-track" id="promoTrack"></div></div>
+ 
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="nav-logo"><img src="image/logo.png" alt="World of Manga"></a>
+  <ul class="nav-links">
+    <li><a href="#catalogue">Collection</a></li>
+    <li><a href="#personnalisation">✏️ Perso</a></li>
+    <li><a href="#livraison">Livraison</a></li>
+    <li><a href="#newsletter">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">🛒 Panier <span class="cart-num" id="cartCount">0</span></button>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+ 
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#catalogue" onclick="toggleMenu()">Collection</a>
+  <a href="#personnalisation" onclick="toggleMenu()">✏️ Personnalisation</a>
+  <a href="#livraison" onclick="toggleMenu()">Livraison</a>
+  <a href="#newsletter" onclick="toggleMenu()">Contact</a>
+</div>
+ 
+<!-- COUNTDOWN -->
+<div class="countdown-banner" id="countdownBanner">
+  <span class="cd-label">⚡ <span>OFFRE FLASH</span> — Se termine dans :</span>
+  <div class="cd-blocks">
+    <div class="cd-block"><span class="cd-num" id="cdH">00</span><span class="cd-unit">Heures</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-block"><span class="cd-num" id="cdM">00</span><span class="cd-unit">Minutes</span></div>
+    <span class="cd-sep">:</span>
+    <div class="cd-block"><span class="cd-num" id="cdS">00</span><span class="cd-unit">Secondes</span></div>
+  </div>
+  <span class="cd-label" style="color:white;">— <span style="color:var(--or);">-15% sur les T-Shirts !!</span></span>
+  <button class="cd-close" onclick="document.getElementById('countdownBanner').style.display='none'">✕</button>
+</div>
+ 
+<!-- HERO -->
+<section class="hero">
+  <div class="panel panel-1">
+    <span class="panel-tag">Édition limitée 2026</span>
+    <h1>Porte<br>l'univers<br><em>Manga.</em></h1>
+    <p>Vêtements et accessoires inspirés des plus grands mangas du monde.</p>
+    <div class="panel-1-btns">
+      <a href="#catalogue" class="btn-manga btn-rouge">Voir la collection</a>
+      <a href="#personnalisation" class="btn-manga btn-or">✏️ Personnaliser</a>
+    </div>
+  </div>
+  <div class="panel panel-2">
+    <span class="sfx-boum s1">INCROYABLE!</span>
+    <span class="sfx-boum s2">ROOM!</span>
+    <span class="sfx-boum s3">ZAP!</span>
+    <img src="image/logo.png" alt="World of Manga">
+  </div>
+  <div class="panel panel-3">
+    <div class="stat-block"><span class="stat-num">120+</span><span class="stat-label">Produits</span></div>
+    <div class="stat-block"><span class="stat-num">48h</span><span class="stat-label">Livraison</span></div>
+    <div class="stat-block"><span class="stat-num">30</span><span class="stat-label">Séries</span></div>
+  </div>
+  <div class="panel panel-4">
+    <span class="tag">Offre spéciale</span>
+    <p>Livraison<br>GRATUITE<br>dès 25 000 FCFA !</p>
+  </div>
+</section>
+ 
+<!-- FILTRES -->
+<div class="cat-section" id="catalogue">
+  <div class="cat-head"><div class="cat-head-line"></div><span class="cat-label">Filtrer la collection</span></div>
+  <div class="cat-filters">
+    <button class="cat-filter active" onclick="filterCat('all',this)"><div class="cat-icon-wrap">🗂️</div><span class="cat-name">Tout</span></button>
+    <button class="cat-filter" onclick="filterCat('tshirt',this)"><div class="cat-icon-wrap">👕</div><span class="cat-name">T-Shirts</span></button>
+    <button class="cat-filter" onclick="filterCat('pull',this)"><div class="cat-icon-wrap">🧥</div><span class="cat-name">Pulls</span></button>
+    <button class="cat-filter" onclick="filterCat('jean',this)"><div class="cat-icon-wrap">👖</div><span class="cat-name">Jeans</span></button>
+    <button class="cat-filter" onclick="filterCat('chaussures',this)"><div class="cat-icon-wrap">👟</div><span class="cat-name">Chaussures</span></button>
+    <button class="cat-filter" onclick="filterCat('totbag',this)"><div class="cat-icon-wrap">👜</div><span class="cat-name">Tote Bags</span></button>
+    <button class="cat-filter" onclick="filterCat('coque',this)"><div class="cat-icon-wrap">📱</div><span class="cat-name">Coques</span></button>
+  </div>
+</div>
+ 
+<!-- PRODUITS -->
+<section class="products-section">
+  <div class="chapter-header">
+    <span class="chapter-num">CHAP. 01</span>
+    <h2 class="chapter-title">La <em>Collection</em></h2>
+  </div>
+  <div class="product-grid" id="productGrid"></div>
+</section>
+ 
+<!-- PERSONNALISATION -->
+<section class="perso-section" id="personnalisation">
+  <span class="perso-badge">✏️ NOUVEAU</span>
+  <h2>Crée ton<br><em>Article Perso !</em></h2>
+  <p>Choisis le vêtement, ta couleur, ta technique et uploade ton image. On le fabrique pour toi !</p>
+  <div class="perso-types">
+  <button class="perso-type-btn active" onclick="selectPersoType(this,'tshirt',10000)">
+    <span style="font-size:2rem;display:block;margin-bottom:6px;">👕</span>
+    <span class="pt-name">T-Shirt</span><span class="pt-price">dès 10 000 F</span>
+  </button>
+  <button class="perso-type-btn" onclick="selectPersoType(this,'pull',15000)">
+    <span style="font-size:2rem;display:block;margin-bottom:6px;">🧥</span>
+    <span class="pt-name">Pull / Hoodie</span><span class="pt-price">dès 15 000 F</span>
+  </button>
+  <button class="perso-type-btn" onclick="selectPersoType(this,'casquette',8000)">
+    <span style="font-size:2rem;display:block;margin-bottom:6px;">🧢</span>
+    <span class="pt-name">Casquette</span><span class="pt-price">dès 8 000 F</span>
+  </button>
+  <button class="perso-type-btn" onclick="selectPersoType(this,'sac',12000)">
+    <span style="font-size:2rem;display:block;margin-bottom:6px;">👜</span>
+    <span class="pt-name">Tote Bag</span><span class="pt-price">dès 12 000 F</span>
+  </button>
+</div>
+  <div class="perso-config">
+    <div>
+      <div class="cfg-block" id="sizeBlock">
+        <div class="cfg-label"><span>📐</span> Taille</div>
+        <div class="size-chips">
+          <div class="size-chip" onclick="selectSize(this)">XS</div>
+          <div class="size-chip" onclick="selectSize(this)">S</div>
+          <div class="size-chip" onclick="selectSize(this)">M</div>
+          <div class="size-chip" onclick="selectSize(this)">L</div>
+          <div class="size-chip" onclick="selectSize(this)">XL</div>
+          <div class="size-chip" onclick="selectSize(this)">XXL</div>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <div class="cfg-label"><span>🎨</span> Couleur du vêtement</div>
+        <div class="color-row">
+          <div class="cfg-color" data-c="Noir" title="Noir" onclick="selectCfgColor(this)"></div>
+          <div class="cfg-color" data-c="Blanc" title="Blanc" onclick="selectCfgColor(this)"></div>
+          <div class="cfg-color" data-c="Rouge" title="Rouge" onclick="selectCfgColor(this)"></div>
+          <div class="cfg-color" data-c="Bleu Marine" title="Bleu Marine" onclick="selectCfgColor(this)"></div>
+          <div class="cfg-color" data-c="Vert" title="Vert" onclick="selectCfgColor(this)"></div>
+          <div class="cfg-color" data-c="Gris" title="Gris" onclick="selectCfgColor(this)"></div>
+        </div>
+        <div class="color-name-tag" id="colorNameTag">Sélectionne une couleur</div>
+      </div>
+      <div class="cfg-block">
+        <div class="cfg-label"><span>🔧</span> Technique</div>
+        <div class="technique-grid">
+          <div class="tech-opt selected" onclick="selectTech(this,'Impression DTF')">
+            <span class="t-icon">🖨️</span>
+            <span class="t-name">Imprimé</span>
+            <span class="t-desc">Couleurs vives, photo-réaliste</span>
+          </div>
+          <div class="tech-opt" onclick="selectTech(this,'Broderie')">
+            <span class="t-icon">🧵</span>
+            <span class="t-name">Brodé</span>
+            <span class="t-desc">Premium, relief, durable (+3 000 F)</span>
+          </div>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <div class="cfg-label"><span>🖼️</span> Ton image / design</div>
+        <div class="upload-tabs">
+          <div class="upload-tab active" onclick="selectUploadSide(this,'Devant')">Devant</div>
+          <div class="upload-tab" onclick="selectUploadSide(this,'Derrière')">Derrière</div>
+        </div>
+        <div id="uploadZoneDevant" class="upload-zone">
+          <span class="uz-icon">📁</span>
+          <span class="uz-label">Clique pour uploader</span>
+          <span class="uz-sub">PNG · JPG · PDF — max 10 Mo</span>
+          <input type="file" id="fileDevant" accept="image/*,.pdf" onchange="handleUpload(this,'devant')">
+          <img class="upload-preview" id="previewDevant" alt="Aperçu devant">
+          <div class="upload-fname" id="fnameDevant"></div>
+        </div>
+        <div id="uploadZoneDerriere" class="upload-zone" style="display:none">
+          <span class="uz-icon">📁</span>
+          <span class="uz-label">Clique pour uploader</span>
+          <span class="uz-sub">PNG · JPG · PDF — max 10 Mo</span>
+          <input type="file" id="fileDerriere" accept="image/*,.pdf" onchange="handleUpload(this,'derriere')">
+          <img class="upload-preview" id="previewDerriere" alt="Aperçu derrière">
+          <div class="upload-fname" id="fnameDerriere"></div>
+        </div>
+      </div>
+      <div class="cfg-block">
+        <div class="cfg-label"><span>💬</span> Instructions supplémentaires</div>
+        <textarea class="perso-note" id="persoNote" placeholder="Ex: Design centré en haut, texte en doré, logo 20cm..."></textarea>
+      </div>
+      <div class="perso-error" id="persoError"></div>
+      <div class="perso-cta">
+        <div class="perso-price-tag">
+          <small>Prix estimé</small>
+          <span id="persoPriceDisplay">10 000 FCFA</span>
+        </div>
+        <button class="btn-manga btn-rouge" onclick="commanderPerso()">📦 Commander ma perso !!</button>
+      </div>
+    </div>
+    <div>
+      <div class="cfg-label"><span>👁️</span> Aperçu en temps réel</div>
+      <div class="preview-side-toggle">
+        <button class="pst-btn active" onclick="togglePreviewSide(this,'devant')">Devant</button>
+        <button class="pst-btn" onclick="togglePreviewSide(this,'derriere')">Derrière</button>
+      </div>
+      <div class="garment-preview">
+        <div class="mockup-container" id="mockupContainer" data-type="tshirt">
+          <div id="mockupSvgWrap" style="width:100%;position:relative;display:flex;align-items:center;justify-content:center;"></div>
+        </div>
+        <div class="preview-label" id="previewLabel">T-Shirt · Sélectionne tes options</div>
+      </div>
+      <div class="perso-recap-box">
+        <div class="cfg-label" style="margin-bottom:8px;"><span>✅</span> Récapitulatif</div>
+        <div class="perso-recap-content" id="persoRecap">Aucune option sélectionnée</div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- LIVRAISON -->
+<div class="delivery-banner" id="livraison">
+  <div class="delivery-item"><span class="delivery-icon">🚀</span><div class="delivery-text"><strong>Livraison 48h</strong><span>Abidjan & environs</span></div></div>
+  <div class="delivery-item"><span class="delivery-icon">🛡️</span><div class="delivery-text"><strong>Paiement sécurisé</strong><span>Wave · Moov · Orange</span></div></div>
+  <div class="delivery-item"><span class="delivery-icon">↩️</span><div class="delivery-text"><strong>Retours 30 jours</strong><span>Satisfait ou Satisfait</span></div></div>
+  <div class="delivery-item"><span class="delivery-icon">🎁</span><div class="delivery-text"><strong>Offres exclusives</strong><span>Abonnés en priorité</span></div></div>
+</div>
+ 
+<!-- NEWSLETTER -->
+<section class="nl-section" id="newsletter">
+  <div class="nl-left">
+    <h2>Rejoins<br>le <em>Clan !</em></h2>
+    <p>Nouvelles collections en avant-première.</p>
+  </div>
+  <div class="nl-form">
+    <input type="email" id="nlEmail" placeholder="Ton adresse email...">
+    <button class="btn-manga btn-ink" onclick="subscribeNL()" style="align-self:flex-start">S'inscrire →</button>
+    <span id="nl-msg"></span>
+  </div>
+</section>
+ 
+<!-- WHATSAPP -->
+<a class="wa-float" href="https://wa.me/0143159266" target="_blank">💬</a>
+<div class="wa-bubble">Commande via WhatsApp !</div>
+ 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="image/logo.png" alt="World of Manga">
+      <p>Ta destination pour tous les dérivés manga. Qualité premium, livraison rapide en Côte d'Ivoire.</p>
+    </div>
+    <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#">Accueil</a></li><li><a href="#catalogue">Collection</a></li><li><a href="#personnalisation">Perso</a></li><li><a href="#newsletter">Contact</a></li></ul></div>
+    <div class="footer-col"><h4>Catégories</h4><ul><li><a href="#">T-Shirts</a></li><li><a href="#">Pulls</a></li><li><a href="#">Tote Bags</a></li><li><a href="#">Coques</a></li></ul></div>
+    <div class="footer-col"><h4>Infos</h4><ul><li><a href="#">Livraison</a></li><li><a href="#">Retours</a></li><li><a href="#">CGV</a></li><li><a href="#">FAQ</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 World of Manga — Tous droits réservés</p>
+    <div class="social-row">
+      <a href="#" title="Instagram">📸</a>
+      <a href="#" title="TikTok">🎵</a>
+      <a href="https://wa.me/0143159266" target="_blank">💬</a>
+    </div>
+  </div>
+</footer>
+ 
+<!-- PANIER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-head"><h3>⚔️ TON ARSENAL</h3><button onclick="closeCart()">✕</button></div>
+  <div class="cart-body" id="cartBody"><div class="cart-empty"><span class="big">🛒</span><p>Panier vide... Pour l'instant !</p></div></div>
+  <div class="cart-foot" id="cartFoot">
+    <div class="cart-total-row"><span>Total</span><span class="big-price" id="cartTotal">0 FCFA</span></div>
+    <button class="btn-manga btn-rouge" style="width:100%;justify-content:center;" onclick="openOrderModal()">Commander !!</button>
+  </div>
+</div>
+ 
+<!-- MODAL OPTIONS PRODUIT -->
+<div class="opt-modal-bg" id="optModal">
+  <div class="opt-modal">
+    <div class="opt-head"><h3 id="optModalTitle">Choisir les options</h3><button onclick="closeOptModal()">✕</button></div>
+    <div class="opt-body" id="optModalBody"></div>
+  </div>
+</div>
+ 
+<!-- MODAL COMMANDE PANIER -->
+<div class="modal-bg" id="orderModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>📦 Finaliser</h3><button onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modalContent"></div>
+  </div>
+</div>
+ 
+<!-- MODAL COMMANDE PERSO -->
+<div class="modal-bg" id="persoModal">
+  <div class="modal-box">
+    <div class="modal-head"><h3>✏️ Ma Commande Perso</h3><button onclick="closePersoModal()">✕</button></div>
+    <div class="modal-body" id="persoModalContent"></div>
+  </div>
+</div>
+ 
+<script>
+const WHATSAPP = '2250143159266';
+const TELEGRAM_BOT_TOKEN = "8864937400:AAFY-0QV1sJZJwLNgk_IrYNGC70zF9g7WvQ";
+const TELEGRAM_CHAT_ID = "1641088586";
+ 
+// ── Firebase ──────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC9UmMNAOsgh6AqkXdxm8jHqUKHxbk_hfc",
+  authDomain: "world-of-manga-f5a48.firebaseapp.com",
+  projectId: "world-of-manga-f5a48",
+  storageBucket: "world-of-manga-f5a48.firebasestorage.app",
+  messagingSenderId: "421326286742",
+  appId: "1:421326286742:web:9a7a6adeebaa2272ef77b7"
+};
+
+let db = null;
+async function initFirebase() {
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getFirestore, collection, addDoc, getDocs, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const app = initializeApp(FIREBASE_CONFIG);
+    db = getFirestore(app);
+    window._fsAddDoc = addDoc; window._fsCollection = collection; window._fsTimestamp = serverTimestamp; window._fsGetDocs = getDocs;
+    await loadProductsFromFirestore();
+  } catch(e) { console.warn('Firebase non configuré:', e.message); renderProducts(); }
+}
+initFirebase();
+
+async function loadProductsFromFirestore(){
+  try {
+    const snap = await window._fsGetDocs(window._fsCollection(db,'produits'));
+    products.length = 0;
+    snap.forEach(doc=>{
+      const d = doc.data();
+      products.push({
+        id: d.id, name: d.name, series: d.series, cat: d.cat,
+        price: d.price, emoji: d.emoji || '✨',
+        image: d.image || null, badge: d.badge || null
+      });
+    });
+    renderProducts();
+    renderMockup();
+  } catch(e){
+    console.error('Erreur chargement produits Firestore:', e);
+    renderProducts();
+  }
+}
+ 
+async function saveToFirebase(data) {
+  if (!db) return null;
+  try {
+    const ref = await window._fsAddDoc(window._fsCollection(db,'commandes'),{...data,createdAt:window._fsTimestamp(),statut:'nouvelle'});
+    return ref.id;
+  } catch(e) { console.error('Firestore:',e); return null; }
+}
+ 
+async function notifyTelegram(message) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TELEGRAM_CHAT_ID,text:message})
+    });
+  } catch(e) { console.error('Erreur Telegram:',e); }
+}
+ 
+// ── MOCKUPS SVG ───────────────────────────────────────
+const COLOR_HEX = {'Noir':'#111111','Blanc':'#eeeeee','Rouge':'#c0180a','Bleu Marine':'#0d2450','Vert':'#1a4d1a','Gris':'#555555'};
+function hexToRgb(hex){ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return {r,g,b}; }
+function lighten(hex,p){ const {r,g,b}=hexToRgb(hex); return `rgb(${Math.min(255,r+p*2)},${Math.min(255,g+p*2)},${Math.min(255,b+p*2)})`; }
+function darken(hex,p){ const {r,g,b}=hexToRgb(hex); return `rgb(${Math.max(0,r-p*2)},${Math.max(0,g-p*2)},${Math.max(0,b-p*2)})`; }
+ 
+const MOCKUP_SVG = {
+  tshirt:(color,side)=>`<svg viewBox="0 0 280 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:260px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))">
+  <defs><linearGradient id="tsg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${lighten(color,18)}"/><stop offset="100%" stop-color="${darken(color,10)}"/></linearGradient><filter id="tsf"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity=".35"/></filter></defs>
+  <path d="M70,45 L30,85 L55,95 L55,270 L225,270 L225,95 L250,85 L210,45 Q175,35 140,35 Q105,35 70,45Z" fill="url(#tsg)" stroke="${darken(color,20)}" stroke-width="1.5" filter="url(#tsf)"/>
+  <path d="M105,45 Q140,60 175,45" fill="none" stroke="${darken(color,20)}" stroke-width="2"/>
+  <path d="M70,45 L30,85 L55,95 L70,70Z" fill="${darken(color,8)}" stroke="${darken(color,20)}" stroke-width="1"/>
+  <path d="M210,45 L250,85 L225,95 L210,70Z" fill="${darken(color,8)}" stroke="${darken(color,20)}" stroke-width="1"/>
+  <line x1="55" y1="95" x2="55" y2="270" stroke="${darken(color,25)}" stroke-width=".8" stroke-dasharray="4,3" opacity=".4"/>
+  <line x1="225" y1="95" x2="225" y2="270" stroke="${darken(color,25)}" stroke-width=".8" stroke-dasharray="4,3" opacity=".4"/>
+  ${side==='devant'
+    ?`<rect id="designZone" x="85" y="105" width="110" height="110" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="5,3" rx="4"/><text x="140" y="158" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)" font-family="sans-serif">TON DESIGN ICI</text>`
+    :`<rect id="designZone" x="85" y="115" width="110" height="100" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="5,3" rx="4"/><text x="140" y="163" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)" font-family="sans-serif">DERRIÈRE</text>`}
+</svg>`,
+ 
+  pull:(color,side)=>`<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:270px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))">
+  <defs><linearGradient id="plg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${lighten(color,12)}"/><stop offset="100%" stop-color="${darken(color,15)}"/></linearGradient></defs>
+  <path d="M75,60 L20,110 L20,170 L55,170 L55,300 L245,300 L245,170 L280,170 L280,110 L225,60 Q190,45 150,45 Q110,45 75,60Z" fill="url(#plg)" stroke="${darken(color,20)}" stroke-width="1.5"/>
+  <path d="M75,60 Q110,45 150,45 Q190,45 225,60 L210,30 Q185,10 150,12 Q115,10 90,30Z" fill="${darken(color,5)}" stroke="${darken(color,20)}" stroke-width="1.5"/>
+  <line x1="135" y1="60" x2="120" y2="110" stroke="${darken(color,30)}" stroke-width="2"/>
+  <line x1="165" y1="60" x2="180" y2="110" stroke="${darken(color,30)}" stroke-width="2"/>
+  <path d="M95,195 Q150,188 205,195 L205,245 Q150,252 95,245Z" fill="${darken(color,12)}" stroke="${darken(color,25)}" stroke-width="1"/>
+  <path d="M75,60 L20,110 L20,170 L55,170 L70,100Z" fill="${darken(color,8)}" stroke="${darken(color,20)}" stroke-width="1"/>
+  <path d="M225,60 L280,110 L280,170 L245,170 L230,100Z" fill="${darken(color,8)}" stroke="${darken(color,20)}" stroke-width="1"/>
+  <rect x="55" y="290" width="190" height="10" fill="${darken(color,18)}" rx="2"/>
+  ${side==='devant'
+    ?`<rect id="designZone" x="100" y="110" width="100" height="75" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="5,3" rx="4"/><text x="150" y="150" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)" font-family="sans-serif">TON DESIGN ICI</text>`
+    :`<rect id="designZone" x="100" y="110" width="100" height="75" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="5,3" rx="4"/><text x="150" y="150" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)" font-family="sans-serif">DERRIÈRE</text>`}
+</svg>`,
+ 
+  casquette:(color,side)=>`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:240px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))">
+  <defs><linearGradient id="cqg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${lighten(color,15)}"/><stop offset="100%" stop-color="${darken(color,15)}"/></linearGradient></defs>
+  <path d="M55,130 Q55,40 140,40 Q225,40 225,130Z" fill="url(#cqg)" stroke="${darken(color,20)}" stroke-width="1.5"/>
+  <path d="M55,130 Q50,160 75,168 Q140,180 205,168 Q230,160 225,130Z" fill="${darken(color,15)}" stroke="${darken(color,25)}" stroke-width="1.5"/>
+  <circle cx="140" cy="43" r="8" fill="${darken(color,20)}" stroke="${darken(color,30)}" stroke-width="1"/>
+  <line x1="140" y1="43" x2="140" y2="130" stroke="${darken(color,25)}" stroke-width=".8" opacity=".5"/>
+  <line x1="97" y1="55" x2="85" y2="130" stroke="${darken(color,25)}" stroke-width=".8" opacity=".4"/>
+  <line x1="183" y1="55" x2="195" y2="130" stroke="${darken(color,25)}" stroke-width=".8" opacity=".4"/>
+  <rect x="115" y="125" width="50" height="12" rx="3" fill="${darken(color,20)}" opacity=".6"/>
+  <rect id="designZone" x="100" y="70" width="80" height="55" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="4,3" rx="4"/>
+  <text x="140" y="100" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.3)" font-family="sans-serif">DESIGN</text>
+</svg>`,
+ 
+  sac:(color,side)=>`<svg viewBox="0 0 260 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:230px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))">
+  <defs><linearGradient id="skg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${lighten(color,10)}"/><stop offset="100%" stop-color="${darken(color,12)}"/></linearGradient></defs>
+  <rect x="30" y="80" width="200" height="220" rx="6" fill="url(#skg)" stroke="${darken(color,20)}" stroke-width="1.5"/>
+  <path d="M80,80 Q80,20 130,18 Q180,16 180,80" fill="none" stroke="${darken(color,25)}" stroke-width="8" stroke-linecap="round"/>
+  <rect x="38" y="88" width="184" height="204" rx="4" fill="none" stroke="${darken(color,25)}" stroke-width=".8" stroke-dasharray="5,3" opacity=".4"/>
+  <rect id="designZone" x="55" y="110" width="150" height="140" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="5,3" rx="4"/>
+  <text x="130" y="183" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.3)" font-family="sans-serif">${side==='devant'?'TON DESIGN ICI':'DERRIÈRE'}</text>
+</svg>`
+};
+ 
+// ── ÉTAT PERSO ────────────────────────────────────────
+let persoState = {
+  type:'tshirt', basePrice:10000, currentPrice:10000,
+  size:'', color:'Noir', tech:'Impression DTF',
+  fileDevant:null, fileDerriere:null,
+  dataDevant:null, dataDerriere:null,
+  uploadSide:'Devant', previewSide:'devant', note:''
+};
+ 
+function renderMockup() {
+  const hex = COLOR_HEX[persoState.color] || '#111111';
+  const svgFn = MOCKUP_SVG[persoState.type];
+  if (!svgFn) return;
+  const wrap = document.getElementById('mockupSvgWrap');
+  wrap.innerHTML = svgFn(hex, persoState.previewSide);
+ 
+  const imgSrc = persoState.previewSide === 'devant' ? persoState.dataDevant : persoState.dataDerriere;
+  if (imgSrc) {
+    const svgEl = wrap.querySelector('svg');
+    if (!svgEl) return;
+    let dz = svgEl.querySelector('#designZone');
+    if (!dz) {
+      const defaults = { tshirt:{x:85,y:105,w:110,h:110}, pull:{x:100,y:110,w:100,h:75}, casquette:{x:100,y:70,w:80,h:55}, sac:{x:55,y:110,w:150,h:140} };
+      const d = defaults[persoState.type] || {x:80,y:100,w:120,h:100};
+      dz = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      dz.setAttribute('id','designZone');
+      dz.setAttribute('x',d.x); dz.setAttribute('y',d.y);
+      dz.setAttribute('width',d.w); dz.setAttribute('height',d.h);
+      dz.setAttribute('fill','none');
+      svgEl.appendChild(dz);
+    }
+    const x=parseFloat(dz.getAttribute('x')||0), y=parseFloat(dz.getAttribute('y')||0);
+    const w=parseFloat(dz.getAttribute('width')||80), h=parseFloat(dz.getAttribute('height')||80);
+    const defs = svgEl.querySelector('defs') || svgEl.insertBefore(document.createElementNS('http://www.w3.org/2000/svg','defs'),svgEl.firstChild);
+    const clipId = 'dc_'+Date.now();
+    const clip = document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+    clip.setAttribute('id',clipId);
+    const cr = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    cr.setAttribute('x',x); cr.setAttribute('y',y); cr.setAttribute('width',w); cr.setAttribute('height',h);
+    clip.appendChild(cr); defs.appendChild(clip);
+    const img = document.createElementNS('http://www.w3.org/2000/svg','image');
+    img.setAttribute('x',x+w*0.05); img.setAttribute('y',y+h*0.05);
+    img.setAttribute('width',w*0.9); img.setAttribute('height',h*0.9);
+    img.setAttribute('href',imgSrc);
+    img.setAttribute('preserveAspectRatio','xMidYMid meet');
+    img.setAttribute('clip-path','url(#'+clipId+')');
+    img.style.opacity='0.9';
+    svgEl.appendChild(img);
+  }
+  const tn={tshirt:'T-Shirt',pull:'Pull / Hoodie',casquette:'Casquette',sac:'Tote Bag'};
+  document.getElementById('previewLabel').textContent=`${tn[persoState.type]} · ${persoState.color||'—'}${persoState.size?' · '+persoState.size:''}`;
+}
+ 
+// ── PRODUITS ──────────────────────────────────────────
+
+
+let products = [];
+ 
+const SIZES  = ['S','M','L','XL','XXL'];
+const COLORS = ['Noir','Blanc','Rouge'];
+const PHONES = ['Samsung A35','Samsung A55','Samsung S25','Samsung S25+','Iphone 12','Iphone 13','Iphone 14','Iphone 15','Iphone 16','Tecno Camon 30','Tecno Camon 40','Infinix Hot 60','Infinix Note 40','Infinix Note 50'];
+let cart = [];
+let selectedPay = 'wave';
+let currentOptProduct = null;
+ 
+// ── INTRO ─────────────────────────────────────────────
+setTimeout(()=>{ const el=document.getElementById('intro-screen'); el.style.transition='opacity .8s'; el.style.opacity='0'; setTimeout(()=>el.style.display='none',800); },3200);
+function skipIntro(){ const el=document.getElementById('intro-screen'); el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.style.display='none',400); }
+ 
+// ── PRODUITS ──────────────────────────────────────────
+function renderProducts(cat='all'){
+  const grid=document.getElementById('productGrid');
+  const list=cat==='all'?products:products.filter(p=>p.cat===cat);
+  grid.innerHTML=list.map(p=>{
+    const hasOpts=['tshirt','pull','coque'].includes(p.cat);
+    const hint=p.cat==='coque'?'Choisir le modèle':'Choisir taille & couleur';
+    return `<div class="pcard" data-id="${p.id}">
+      ${p.badge?`<div class="pcard-badge">${p.badge}</div>`:''}
+      <div class="pcard-visual">${p.image?`<img class="pcard-img" src="${p.image}" alt="${p.name}" loading="lazy">`:`<div class="pcard-emoji-wrap">${p.emoji}</div>`}</div>
+      <div class="pcard-info">
+        <div class="pcard-top-row"><span class="pcard-name">${p.name}</span><span class="pcard-price">${p.price.toLocaleString()} F</span></div>
+        <div class="pcard-series-row"><span class="pcard-series">${p.series}</span>${hasOpts?`<span class="pcard-options-hint">⚙ ${hint}</span>`:''}</div>
+      </div>
+      <div class="pcard-hover-fx">
+        <span class="sfx">GET IT!!</span>
+        <span class="price-big">${p.price.toLocaleString()} FCFA</span>
+        <button class="choose-btn" onclick="openOptModal(${p.id},event)">${hasOpts?'⚙ Choisir les options':'+ Ajouter au panier'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterCat(cat,btn){ document.querySelectorAll('.cat-filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderProducts(cat); }
+ 
+// ── MODAL OPTIONS PRODUIT ─────────────────────────────
+function openOptModal(id,e){
+  if(e) e.stopPropagation();
+  const p=products.find(x=>x.id===id); if(!p) return;
+  currentOptProduct=p; document.getElementById('optModalTitle').textContent=p.name;
+  let html=`<div class="opt-preview">${p.image?`<img class="opt-preview-img" src="${p.image}" alt="${p.name}">`:`<div class="opt-preview-emoji">${p.emoji}</div>`}
+    <div class="opt-preview-info"><div class="opt-series">${p.series}</div><h4>${p.name}</h4><div class="opt-price">${p.price.toLocaleString()} FCFA</div></div>
+  </div><div class="opt-error" id="optError"></div>`;
+  if(p.cat==='coque'){
+    html+=`<div class="opt-section"><span class="opt-section-label">📱 Modèle de téléphone</span><div class="opt-chips" id="phoneChips">${PHONES.map(ph=>`<button class="opt-chip" onclick="selectChip(this,'phone')">${ph}</button>`).join('')}</div></div>`;
+  } else if(['tshirt','pull'].includes(p.cat)){
+    html+=`<div class="opt-section"><span class="opt-section-label">📐 Taille</span><div class="opt-chips" id="sizeChips">${SIZES.map(s=>`<button class="opt-chip" onclick="selectChip(this,'size')">${s}</button>`).join('')}</div></div>
+    <div class="opt-section"><span class="opt-section-label">🎨 Couleur</span><div class="color-chips" id="colorChips">${COLORS.map(c=>`<div class="color-chip" data-color="${c}" title="${c}" onclick="selectColor(this)"></div>`).join('')}</div></div>`;
+  }
+  html+=`<button class="btn-manga btn-rouge" style="width:100%;justify-content:center;margin-top:1rem;" onclick="confirmAddToCart()">+ Ajouter au panier</button>`;
+  document.getElementById('optModalBody').innerHTML=html;
+  document.getElementById('optModal').classList.add('open');
+}
+function closeOptModal(){ document.getElementById('optModal').classList.remove('open'); currentOptProduct=null; }
+function selectChip(el){ el.closest('.opt-chips').querySelectorAll('.opt-chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); }
+function selectColor(el){ el.closest('.color-chips').querySelectorAll('.color-chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); }
+function confirmAddToCart(){
+  const p=currentOptProduct; if(!p) return;
+  const err=document.getElementById('optError'); let opts={};
+  if(p.cat==='coque'){ const s=document.querySelector('#phoneChips .opt-chip.selected'); if(!s){err.textContent='!! Choisis un modèle !!';return;} opts.phone=s.textContent; }
+  else if(['tshirt','pull'].includes(p.cat)){ const sz=document.querySelector('#sizeChips .opt-chip.selected'); const cl=document.querySelector('#colorChips .color-chip.selected'); if(!sz){err.textContent='!! Choisis une taille !!';return;} if(!cl){err.textContent='!! Choisis une couleur !!';return;} opts.size=sz.textContent; opts.color=cl.dataset.color; }
+  closeOptModal(); addToCart(p.id,opts);
+}
+ 
+// ── PANIER ────────────────────────────────────────────
+function addToCart(id,opts={}){
+  const p=products.find(x=>x.id===id); if(!p) return;
+  const key=id+JSON.stringify(opts);
+  const ex=cart.find(c=>c.key===key);
+  if(ex){ex.qty++;}else{cart.push({...p,qty:1,opts,key});}
+  updateCartUI(); openCart();
+}
+function removeFromCart(key){ cart=cart.filter(c=>c.key!==key); updateCartUI(); }
+function changeQty(key,d){ const i=cart.find(c=>c.key===key); if(!i) return; i.qty+=d; if(i.qty<=0) cart=cart.filter(c=>c.key!==key); updateCartUI(); }
+function optsLabel(i){ if(i.opts.phone) return `📱 ${i.opts.phone}`; if(i.opts.size) return `📐 ${i.opts.size} · 🎨 ${i.opts.color}`; return ''; }
+ 
+function updateCartUI(){
+  const n=cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('cartCount').textContent=n;
+  const body=document.getElementById('cartBody');
+  const foot=document.getElementById('cartFoot');
+  if(!cart.length){
+    body.innerHTML=`<div class="cart-empty"><span class="big">🛒</span><p>Panier vide... Pour l'instant !</p></div>`;
+    foot.style.display='none'; return;
+  }
+  foot.style.display='block';
+  body.innerHTML=cart.map(c=>{
+    const safeKey=encodeURIComponent(c.key);
+    return `<div class="cart-item">
+      <div class="ci-thumb">${c.image?`<img src="${c.image}" alt="${c.name}">`:c.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${c.name}</div>
+        ${optsLabel(c)?`<div class="ci-opts">${optsLabel(c)}</div>`:''}
+        <div class="ci-price">${c.price.toLocaleString()} FCFA</div>
+        <div class="ci-qty">
+          <button class="qty-btn" data-action="minus" data-key="${safeKey}">−</button>
+          <span>${c.qty}</span>
+          <button class="qty-btn" data-action="plus" data-key="${safeKey}">+</button>
+        </div>
+      </div>
+      <button class="ci-del" data-action="delete" data-key="${safeKey}">✕</button>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent=cart.reduce((s,c)=>s+c.price*c.qty,0).toLocaleString()+' FCFA';
+}
+ 
+// Délégation d'événements panier
+document.getElementById('cartBody').addEventListener('click',function(e){
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const key=decodeURIComponent(btn.dataset.key);
+  const action=btn.dataset.action;
+  if(action==='delete') removeFromCart(key);
+  else if(action==='minus') changeQty(key,-1);
+  else if(action==='plus')  changeQty(key,+1);
+});
+ 
+function openCart(){ document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartSidebar').classList.add('open'); }
+function closeCart(){ document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartSidebar').classList.remove('open'); }
+ 
+// ── FORMULAIRE COMMANDE (HTML réutilisable) ───────────
+function orderFormHTML(ids){
+  return `
+    <div class="two-col">
+      <div><label class="field-label">Prénom</label><input class="modal-input" id="${ids.prenom}" placeholder="Naruto"></div>
+      <div><label class="field-label">Nom</label><input class="modal-input" id="${ids.nom}" placeholder="Uzumaki"></div>
+    </div>
+    <label class="field-label">Téléphone / WhatsApp</label>
+    <input class="modal-input" id="${ids.tel}" placeholder="+225 07 00 00 00 00">
+    <label class="field-label">Quartier / Adresse</label>
+    <input class="modal-input" id="${ids.adresse}" placeholder="Cocody, Yopougon...">
+    <label class="field-label">Ville</label>
+    <select class="modal-input" id="${ids.ville}">
+      <option value="">-- Sélectionner --</option>
+      <option>Abidjan</option><option>Bouaké</option><option>Yamoussoukro</option><option>San-Pédro</option><option>Korhogo</option><option>Autre</option>
+    </select>`;
+}
+function paymentGridHTML(){
+
+  return `<div class="payment-grid">
+
+    <div class="pay-opt selected" onclick="selPay(this,'wave')">
+      <img src="image/wave.jpg" class="pay-logo">
+      <span class="p-name">Wave</span>
+    </div>
+
+    <div class="pay-opt" onclick="selPay(this,'moov')">
+      <img src="image/Moov.jpg" class="pay-logo">
+      <span class="p-name">Moov Money</span>
+    </div>
+
+    <div class="pay-opt" onclick="selPay(this,'orange')">
+      <img src="image/Orange.jpg" class="pay-logo">
+      <span class="p-name">Orange Money</span>
+    </div>
+
+  <div class="pay-opt" onclick="selPay(this,'mtn')">
+      <img src="image/Mtn.jpg" class="pay-logo">
+      <span class="p-name">Mtn Money</span>
+    </div>
+
+  </div>`;
+}
+ 
+// ── MODAL COMMANDE PANIER ─────────────────────────────
+function openOrderModal(){
+  closeCart();
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const frais=total>=25000?0:1500;
+  const summaryHTML=`<div class="order-summary" id="orderSummary"><h4>// Récapitulatif</h4>
+    ${cart.map(c=>`<div class="sum-line"><span>${c.name}${optsLabel(c)?` (${optsLabel(c)})`:''}  ×${c.qty}</span><span>${(c.price*c.qty).toLocaleString()} FCFA</span></div>`).join('')}
+    <div class="sum-line"><span>Livraison</span><span>${frais===0?'Gratuite 🎉':frais.toLocaleString()+' FCFA'}</span></div>
+    <div class="sum-total"><span>À payer</span><span>${(total+frais).toLocaleString()} FCFA</span></div></div>`;
+  document.getElementById('modalContent').innerHTML=
+    orderFormHTML({prenom:'fPrenom',nom:'fNom',tel:'fTel',adresse:'fAdresse',ville:'fVille'})
+    +summaryHTML
+    +`<label class="field-label">Mode de paiement</label>`
+    +paymentGridHTML()
+    +`<button class="btn-manga btn-rouge" style="width:100%;justify-content:center;margin-top:.5rem;" onclick="submitOrder()">CONFIRMER ✓</button>`;
+  selectedPay='wave';
+  document.getElementById('orderModal').classList.add('open');
+}
+ 
+function closeModal(){
+  document.getElementById('orderModal').classList.remove('open');
+  // Vider proprement pour la prochaine ouverture
+  document.getElementById('modalContent').innerHTML='';
+  selectedPay='wave';
+}
+ 
+function selPay(el,m){
+  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected'); selectedPay=m;
+}
+ 
+async function submitOrder(){
+  const prenom=document.getElementById('fPrenom').value.trim();
+  const nom=document.getElementById('fNom').value.trim();
+  const tel=document.getElementById('fTel').value.trim();
+  const adresse=document.getElementById('fAdresse').value.trim();
+  const ville=document.getElementById('fVille').value;
+  if(!prenom||!nom||!tel||!adresse||!ville){alert('Remplis tous les champs !');return;}
+ 
+  const btn=document.querySelector('#orderModal .btn-rouge');
+  if(btn){btn.textContent='⏳ Traitement...';btn.disabled=true;}
+ 
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0),frais=total>=25000?0:1500,grand=total+frais;
+  const lignes=cart.map(c=>`• ${c.name}${optsLabel(c)?` (${optsLabel(c)})`:''}  x${c.qty} — ${(c.price*c.qty).toLocaleString()} FCFA`).join('\n');
+  const pl={wave:'Wave',moov:'Moov Money',orange:'Orange Money',livraison:'À la livraison'};
+ 
+  const commandeId='TEST123';
+  const notifMsg=`🛒 NOUVELLE COMMANDE #${commandeId} — World of Manga\n👤 ${prenom} ${nom}\n📞 ${tel}\n📍 ${adresse}, ${ville}\n💳 ${pl[selectedPay]}\n${lignes}\n💰 TOTAL: ${grand.toLocaleString()} FCFA`;
+  await notifyTelegram(notifMsg);
+ 
+  const msgClient=`🛒 *NOUVELLE COMMANDE — World of Manga*\n\n👤 *Client :* ${prenom} ${nom}\n📞 *Tél :* ${tel}\n📍 *Adresse :* ${adresse}, ${ville}\n💳 *Paiement :* ${pl[selectedPay]}\n\n*Produits :*\n${lignes}\n🚚 Livraison : ${frais===0?'Gratuite 🎉':frais.toLocaleString()+' FCFA'}\n\n💰 *TOTAL : ${grand.toLocaleString()} FCFA*`;
+  const waUrl=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msgClient)}`;
+ 
+  document.getElementById('modalContent').innerHTML=`
+    <div class="success-box">
+      <span class="success-sfx">VICTORY!!</span>
+      <p>Super ${prenom} ! 🎉<br><br>✅ Commande enregistrée<br><br>Clique pour confirmer sur <strong>WhatsApp</strong>.</p><br>
+      <a href="${waUrl}" target="_blank" class="btn-manga btn-rouge" style="display:inline-flex;margin-top:1rem;text-decoration:none;"
+         onclick="setTimeout(()=>{closeModal();resetCart();},1500)">
+        💬 Confirmer sur WhatsApp
+      </a>
+    </div>`;
+}
+ 
+function resetCart(){ cart=[]; updateCartUI(); }
+ 
+// ── MODAL COMMANDE PERSO ──────────────────────────────
+function commanderPerso(){
+  const err=document.getElementById('persoError');
+  if(['tshirt','pull'].includes(persoState.type)&&!persoState.size){err.textContent='!! Choisis une taille !!';return;}
+  if(!persoState.color){err.textContent='!! Choisis une couleur !!';return;}
+  if(!persoState.fileDevant&&!persoState.fileDerriere){err.textContent='!! Uploade au moins une image !!';return;}
+  err.textContent='';
+  const tn={tshirt:'T-Shirt',pull:'Pull / Hoodie',casquette:'Casquette',sac:'Tote Bag'};
+  const note=document.getElementById('persoNote').value.trim();
+  const frais=persoState.currentPrice>=25000?0:1500;
+  const summaryHTML=`<div class="order-summary" id="persoOrderSummary"><h4>// Commande Personnalisée</h4>
+    <div class="sum-line"><span>Article</span><span>${tn[persoState.type]}</span></div>
+    ${persoState.size?`<div class="sum-line"><span>Taille</span><span>${persoState.size}</span></div>`:''}
+    <div class="sum-line"><span>Couleur</span><span>${persoState.color}</span></div>
+    <div class="sum-line"><span>Technique</span><span>${persoState.tech}</span></div>
+    ${persoState.fileDevant?`<div class="sum-line"><span>Image devant</span><span>✓ ${persoState.fileDevant.name}</span></div>`:''}
+    ${persoState.fileDerriere?`<div class="sum-line"><span>Image derrière</span><span>✓ ${persoState.fileDerriere.name}</span></div>`:''}
+    ${note?`<div class="sum-line"><span>Note</span><span>${note}</span></div>`:''}
+    <div class="sum-line"><span>Livraison</span><span>${frais===0?'Gratuite 🎉':frais.toLocaleString()+' FCFA'}</span></div>
+    <div class="sum-total"><span>Estimation totale</span><span>${(persoState.currentPrice+frais).toLocaleString()} FCFA</span></div>
+  </div>`;
+  document.getElementById('persoModalContent').innerHTML=
+    orderFormHTML({prenom:'pfPrenom',nom:'pfNom',tel:'pfTel',adresse:'pfAdresse',ville:'pfVille'})
+    +summaryHTML
+    +`<label class="field-label">Mode de paiement</label>`
+    +paymentGridHTML()
+    +`<button class="btn-manga btn-rouge" style="width:100%;justify-content:center;margin-top:.5rem;" onclick="submitPersoOrder()">💬 Envoyer sur WhatsApp</button>`;
+  selectedPay='wave';
+  document.getElementById('persoModal').classList.add('open');
+}
+ 
+function closePersoModal(){
+  document.getElementById('persoModal').classList.remove('open');
+  // Vider proprement pour la prochaine ouverture
+  document.getElementById('persoModalContent').innerHTML='';
+  selectedPay='wave';
+}
+ 
+async function submitPersoOrder(){
+  const prenom=document.getElementById('pfPrenom').value.trim();
+  const nom=document.getElementById('pfNom').value.trim();
+  const tel=document.getElementById('pfTel').value.trim();
+  const adresse=document.getElementById('pfAdresse').value.trim();
+  const ville=document.getElementById('pfVille').value;
+  if(!prenom||!nom||!tel||!adresse||!ville){alert('Remplis tous les champs !');return;}
+ 
+  const tn={tshirt:'T-Shirt',pull:'Pull / Hoodie',casquette:'Casquette',sac:'Tote Bag'};
+  const pl={wave:'Wave',moov:'Moov Money',orange:'Orange Money',livraison:'À la livraison'};
+  const note=document.getElementById('persoNote').value.trim();
+  const frais=persoState.currentPrice>=25000?0:1500;
+  const grand=persoState.currentPrice+frais;
+ 
+  const commandeId=await saveToFirebase({
+    type:'personnalisation',
+    client:{prenom,nom,telephone:tel,adresse,ville},
+    personnalisation:{article:tn[persoState.type],taille:persoState.size,couleur:persoState.color,technique:persoState.tech,imageDevant:persoState.fileDevant?.name||null,imageDerriere:persoState.fileDerriere?.name||null,note},
+    paiement:selectedPay, grand_total:grand, source:'web'
+  });
+ 
+  const notifMsg=`✏️ COMMANDE PERSO #${commandeId||'—'} — World of Manga\n👤 ${prenom} ${nom} | 📞 ${tel}\n👕 ${tn[persoState.type]} ${persoState.size} ${persoState.color}\n🔧 ${persoState.tech}\n💰 ${grand.toLocaleString()} FCFA`;
+  await notifyTelegram(notifMsg);
+ 
+  let msg=`✏️ *COMMANDE PERSONNALISÉE — World of Manga*\n\n👤 *Client :* ${prenom} ${nom}\n📞 *Tél :* ${tel}\n📍 *Adresse :* ${adresse}, ${ville}\n💳 *Paiement :* ${pl[selectedPay]}\n\n*🎨 Détails :*\n• Article : ${tn[persoState.type]}\n`;
+  if(persoState.size) msg+=`• Taille : ${persoState.size}\n`;
+  msg+=`• Couleur : ${persoState.color}\n• Technique : ${persoState.tech}\n`;
+  if(persoState.fileDevant) msg+=`• Image devant : ${persoState.fileDevant.name} _(à envoyer ici)_\n`;
+  if(persoState.fileDerriere) msg+=`• Image derrière : ${persoState.fileDerriere.name} _(à envoyer ici)_\n`;
+  if(note) msg+=`• Instructions : ${note}\n`;
+  msg+=`\n🚚 Livraison : ${frais===0?'Gratuite 🎉':frais.toLocaleString()+' FCFA'}\n💰 *ESTIMATION : ${grand.toLocaleString()} FCFA*\n\n_⚠️ Envoie tes images dans ce chat après !_`;
+  const waUrl=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+ 
+  document.getElementById('persoModalContent').innerHTML=`
+    <div class="success-box">
+      <span class="success-sfx">CUSTOM!!</span>
+      <p>Super ${prenom} ! 🎉<br><br>
+      ✅ Commande enregistrée${commandeId?' (#'+commandeId.slice(0,6)+'...)':''}<br><br>
+      1️⃣ Clique WhatsApp pour confirmer<br>
+      2️⃣ <strong>Envoie tes images</strong> dans la conversation</p><br>
+      <a href="${waUrl}" target="_blank" class="btn-manga btn-rouge" style="display:inline-flex;margin-top:1rem;text-decoration:none;">
+        💬 Envoyer sur WhatsApp
+      </a>
+    </div>`;
+}
+ 
+// ── PERSONNALISATION ──────────────────────────────────
+function selectPersoType(btn,type,price){
+  document.querySelectorAll('.perso-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  persoState.type=type; persoState.basePrice=price;
+  document.getElementById('sizeBlock').style.display=['tshirt','pull'].includes(type)?'block':'none';
+  updatePersoPrice(); updatePersoRecap(); renderMockup();
+}
+function selectSize(el){
+  document.querySelectorAll('.size-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); persoState.size=el.textContent; updatePersoRecap();
+}
+function selectCfgColor(el){
+  document.querySelectorAll('.cfg-color').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected'); persoState.color=el.dataset.c;
+  document.getElementById('colorNameTag').textContent=el.dataset.c;
+  renderMockup(); updatePersoRecap();
+}
+function selectTech(el,tech){
+  document.querySelectorAll('.tech-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected'); persoState.tech=tech; updatePersoPrice(); updatePersoRecap();
+}
+function selectUploadSide(el,side){
+  document.querySelectorAll('.upload-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); persoState.uploadSide=side;
+  document.getElementById('uploadZoneDevant').style.display=side==='Devant'?'flex':'none';
+  document.getElementById('uploadZoneDerriere').style.display=side==='Derrière'?'flex':'none';
+}
+function handleUpload(input,side){
+  const file=input.files[0]; if(!file) return;
+  const cap=side.charAt(0).toUpperCase()+side.slice(1);
+  const preview=document.getElementById('preview'+cap);
+  const fname=document.getElementById('fname'+cap);
+  const zone=document.getElementById('uploadZone'+cap);
+  zone.classList.add('has-file');
+  fname.textContent='✓ '+file.name;
+  if(side==='devant') persoState.fileDevant=file; else persoState.fileDerriere=file;
+  if(file.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const dataUrl=e.target.result;
+      preview.src=dataUrl; preview.classList.add('show');
+      if(side==='devant') persoState.dataDevant=dataUrl; else persoState.dataDerriere=dataUrl;
+      updatePersoPrice(); updatePersoRecap(); renderMockup();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+function togglePreviewSide(btn,side){
+  document.querySelectorAll('.pst-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); persoState.previewSide=side; renderMockup();
+}
+function updatePersoPrice(){
+  let p=persoState.basePrice;
+  if(persoState.tech==='Broderie') p+=5000;
+  if(persoState.fileDevant&&persoState.fileDerriere) p+=2000;
+  persoState.currentPrice=p;
+  document.getElementById('persoPriceDisplay').textContent=p.toLocaleString()+' FCFA';
+}
+function updatePersoRecap(){
+  const tn={tshirt:'T-Shirt',pull:'Pull / Hoodie',casquette:'Casquette',sac:'Tote Bag'};
+  const lines=[`👕 Article : ${tn[persoState.type]||persoState.type}`];
+  if(persoState.size) lines.push(`📐 Taille : ${persoState.size}`);
+  if(persoState.color) lines.push(`🎨 Couleur : ${persoState.color}`);
+  if(persoState.tech) lines.push(`🔧 Technique : ${persoState.tech}`);
+  if(persoState.fileDevant) lines.push(`🖼️ Devant : ✓ ${persoState.fileDevant.name}`);
+  if(persoState.fileDerriere) lines.push(`🖼️ Derrière : ✓ ${persoState.fileDerriere.name}`);
+  document.getElementById('persoRecap').innerHTML=lines.join('<br>');
+}
+ 
+// ── BANDEAU PROMO ─────────────────────────────────────
+const promoMsgs=['🔥 LIVRAISON GRATUITE dès 25 000 FCFA','⚡ -15% sur tous les T-Shirts ce weekend','🎁 Pack 3 coques = 1 offerte','🚀 Livraison 48h à Abidjan','👕 Nouvelle collection Demon Slayer disponible','✏️ Articles personnalisés disponibles !!' ];
+document.getElementById('promoTrack').innerHTML=[...promoMsgs,...promoMsgs].map(m=>`<span class="promo-item">${m}</span><span class="promo-sep">✦</span>`).join('');
+ 
+// ── COUNTDOWN ─────────────────────────────────────────
+function getDeadline(){ const s=localStorage.getItem('wom_deadline'); if(s&&Date.now()<parseInt(s)) return parseInt(s); const d=Date.now()+5*60*60*1000+47*60*1000+33*1000; localStorage.setItem('wom_deadline',d); return d; }
+const deadline=getDeadline();
+function updateCD(){ const diff=Math.max(0,deadline-Date.now()); document.getElementById('cdH').textContent=String(Math.floor(diff/3600000)).padStart(2,'0'); document.getElementById('cdM').textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0'); document.getElementById('cdS').textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0'); if(diff===0) document.getElementById('countdownBanner').style.display='none'; }
+updateCD(); setInterval(updateCD,1000);
+ 
+function subscribeNL(){ const e=document.getElementById('nlEmail').value.trim(),m=document.getElementById('nl-msg'); if(!e||!e.includes('@')){m.style.color='#e8180c';m.textContent='!! Email invalide !!';return;} m.style.color='#1a3a6b';m.textContent='✓ BIENVENUE DANS LE CLAN !!'; document.getElementById('nlEmail').value=''; }
+function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); } 
+
+renderMockup();
+</script>
+</body>
+</html>
