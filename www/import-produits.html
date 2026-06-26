@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Import Produits - World of Manga</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 30px; }
+    h1 { color: #e63946; }
+    button { background: #e63946; color: white; border: none; padding: 15px 30px; font-size: 18px; cursor: pointer; border-radius: 8px; margin-top: 20px; }
+    button:hover { background: #c1121f; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    #log { margin-top: 20px; background: #222; padding: 20px; border-radius: 8px; max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.8; }
+    .ok { color: #4caf50; }
+    .err { color: #e63946; }
+    .info { color: #ffd700; }
+  </style>
+</head>
+<body>
+  <h1>🔥 Import Produits → Firestore</h1>
+  <p>Clique sur le bouton pour importer tous les produits dans Firestore.</p>
+  <button id="btn" onclick="startImport()">🚀 Lancer l'import</button>
+  <div id="log"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9UmMNAOsgh6AqkXdxm8jHqUKHxbk_hfc",
+      authDomain: "world-of-manga-f5a48.firebaseapp.com",
+      projectId: "world-of-manga-f5a48",
+      storageBucket: "world-of-manga-f5a48.firebasestorage.app",
+      messagingSenderId: "421326286742",
+      appId: "1:421326286742:web:9a7a6adeebaa2272ef77b7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const products = [
+      {id:53, name:"Pull Hunter x Hunter",    series:"Hunter x Hunter",  cat:"pull",       price:15000, emoji:"🌊", image:"image/pullhxh.png",                              badge:null},
+      {id:54, name:"Pull Akatsuki",            series:"Naruto",           cat:"pull",       price:15000, emoji:"🌊", image:"image/pullakatsuki.png",                         badge:null},
+      {id:55, name:"Pull One Piece",           series:"One Piece",        cat:"pull",       price:15000, emoji:"🌊", image:"image/pullzoro.png",                             badge:null},
+      {id:56, name:"Pull Kurapika",            series:"Hunter x Hunter",  cat:"pull",       price:15000, emoji:"🌊", image:"image/pullkurapika.png",                         badge:null},
+      {id:57, name:"Pull My Hero Academia",    series:"My Hero Academia", cat:"pull",       price:15000, emoji:"🌊", image:"image/pullmha.png",                              badge:null},
+      {id:58, name:"Pull JBA",                 series:"Jojo's Bizarre",   cat:"pull",       price:15000, emoji:"🌊", image:"image/pulljojo.png",                             badge:null},
+      {id:59, name:"Pull Ichigo",              series:"Bleach",           cat:"pull",       price:15000, emoji:"⚔️", image:"image/pullbleach.png",                          badge:null},
+      {id:60, name:"Pull Gear 5",              series:"One Piece",        cat:"pull",       price:15000, emoji:"⚔️", image:"image/pullgear5.png",                           badge:null},
+      {id:61, name:"Pull Chopper",             series:"One Piece",        cat:"pull",       price:15000, emoji:"⚔️", image:"image/pullchopper.png",                         badge:null},
+      {id:1,  name:"Jean Fusion",              series:"Fusion",           cat:"jean",       price:25000, emoji:"🌊", image:"image/jeankilluazenitsu.png",                    badge:"édition limitée"},
+      {id:2,  name:"Jean Blue Lock",           series:"Blue lock",        cat:"jean",       price:25000, emoji:"🌊", image:"image/jeanbluelock.png",                         badge:"édition limitée"},
+      {id:3,  name:"Jean Itachi",              series:"Naruto",           cat:"jean",       price:25000, emoji:"🌊", image:"image/jeanitachi.png",                           badge:"édition limitée"},
+      {id:4,  name:"Jean Sukuna",              series:"Jujutsu Kaisen",   cat:"jean",       price:25000, emoji:"🌊", image:"image/jeansukuna.png",                           badge:"édition limitée"},
+      {id:5,  name:"Jean Nanami",              series:"Jujutsu Kaisen",   cat:"jean",       price:25000, emoji:"🌊", image:"image/jeannanami.png",                           badge:"édition limitée"},
+      {id:6,  name:"Jean Fusion",              series:"Fusion",           cat:"jean",       price:25000, emoji:"🌊", image:"image/jeangirl.png",                             badge:"édition limitée"},
+      {id:7,  name:"Jean Nico Robin et Nami",  series:"One Piece",        cat:"jean",       price:25000, emoji:"🌊", image:"image/jeanrobinnico.png",                        badge:"édition limitée"},
+      {id:8,  name:"Jean Jujutsu Kaisen",      series:"Jujutsu Kaisen",   cat:"jean",       price:25000, emoji:"🌊", image:"image/jeanjjk.png",                              badge:"édition limitée"},
+      {id:9,  name:"Jean Gojo",                series:"Jujutsu Kaisen",   cat:"jean",       price:25000, emoji:"🌊", image:"image/jeangojo.png",                             badge:"édition limitée"},
+      {id:10, name:"Culotte Jean Hisoka",      series:"Hunter x Hunter",  cat:"jean",       price:15000, emoji:"🌊", image:"image/jeanhisoka.png",                           badge:"édition limitée"},
+      {id:11, name:"Culotte Jean Naruto",      series:"Naruto",           cat:"jean",       price:15000, emoji:"🌊", image:"image/jeannaruto.png",                           badge:"édition limitée"},
+      {id:12, name:"Culotte Jean Zoro",        series:"One piece",        cat:"jean",       price:15000, emoji:"🌊", image:"image/jeanzorro.png",                            badge:"édition limitée"},
+      {id:13, name:"PAS ENCORE DISPONIBLE",    series:"",                 cat:"poster",     price:0,     emoji:"✊", image:null,                                             badge:null},
+      {id:14, name:"PAS ENCORE DISPONIBLE",    series:"",                 cat:"poster",     price:0,     emoji:"🗡️", image:null,                                            badge:null},
+      {id:15, name:"T-Shirt Black Clover",     series:"Black Clover",     cat:"tshirt",     price:10000, emoji:"👁️", image:"image/tshirtblack.png",                         badge:"Promo"},
+      {id:16, name:"T-Shirt Demon Slayer",     series:"Demon Slayer",     cat:"tshirt",     price:10000, emoji:"👁️", image:"image/tshirtslayer3.png",                       badge:"Promo"},
+      {id:17, name:"T-Shirt Zenitsu",          series:"Demon Slayer",     cat:"tshirt",     price:10000, emoji:"👁️", image:"image/tshirtzenitsu.png",                       badge:"Promo"},
+      {id:18, name:"T-Shirt Demon Slayer",     series:"Demon Slayer",     cat:"tshirt",     price:10000, emoji:"👁️", image:"image/tshirtslayer2.png",                       badge:"Promo"},
+      {id:19, name:"T-Shirt Demon Slayer",     series:"Demon Slayer",     cat:"tshirt",     price:10000, emoji:"👁️", image:"image/tshirtslayer1.png",                       badge:"Promo"},
+      {id:20, name:"T-Shirt Boa",              series:"One Piece",        cat:"tshirt",     price:10000, emoji:"👘", image:"image/tshirtboa.png",                            badge:"Bestseller"},
+      {id:21, name:"T-Shirt Toji",             series:"JJK",              cat:"tshirt",     price:8000,  emoji:"🔵", image:"image/tshirttoji.png",                           badge:"Nouveau"},
+      {id:22, name:"T-Shirt Choso",            series:"JJK",              cat:"tshirt",     price:10000, emoji:"🔵", image:"image/tshirtchoso.png",                          badge:"Nouveau"},
+      {id:23, name:"T-Shirt Yuji",             series:"JJK",              cat:"tshirt",     price:10000, emoji:"🔵", image:"image/tshirtyuji.png",                           badge:"Nouveau"},
+      {id:24, name:"T-Shirt Jabber",           series:"Gachiakuta",       cat:"tshirt",     price:10000, emoji:"🔵", image:"image/tshirtJabber.jpg",                         badge:"Nouveau"},
+      {id:25, name:"T-Shirt Gachiakuta",       series:"Gachiakuta",       cat:"tshirt",     price:10000, emoji:"🔵", image:"image/tshirtGachiakuta.png",                     badge:"Nouveau"},
+      {id:26, name:"T-Shirt jojo's Bizarre",   series:"Jojo's Bizarre",   cat:"tshirt",     price:10000, emoji:"🔵", image:"image/tshirtdiogiorno.png",                      badge:"Nouveau"},
+      {id:27, name:"T-Shirt Dan Da Dan",       series:"Dan Da Dan",       cat:"tshirt",     price:8000,  emoji:"🔵", image:"image/tshirtokarun.png",                         badge:"Nouveau"},
+      {id:28, name:"T-Shirt Gai",              series:"Naruto",           cat:"tshirt",     price:8000,  emoji:"🔵", image:"image/tshirtgai.png",                            badge:"Nouveau"},
+      {id:29, name:"Chaussures Solo leveling", series:"Solo leveling",    cat:"chaussures", price:30000, emoji:"⚔️", image:"image/SoloLevelingAirForce1.png",                badge:"Exclusive"},
+      {id:30, name:"Chaussures Jujutsu Kaisen",series:"Jujutsu Kaisen",   cat:"chaussures", price:30000, emoji:"⚔️", image:"image/JujutsuKaisenAirForce1.png",               badge:"Exclusive"},
+      {id:31, name:"Chaussures Dr Stone",      series:"Dr Stone",         cat:"chaussures", price:30000, emoji:"⚔️", image:"image/DrStoneAirForce1.png",                     badge:"Exclusive"},
+      {id:32, name:"Chaussures Demon Slayer",  series:"Demon Slayer",     cat:"chaussures", price:30000, emoji:"⚔️", image:"image/DemonSlayerTanjiroetNezukoAirForce1.png",  badge:"Exclusive"},
+      {id:33, name:"Chaussures Dragon Ball",   series:"Dragon Ball",      cat:"chaussures", price:30000, emoji:"⚔️", image:"image/DragonBallAirForce1.png",                  badge:"Exclusive"},
+      {id:34, name:"Coque Sukuna",             series:"JJK",              cat:"coque",      price:8000,  emoji:"😈", image:"image/coquesukuna.png",                          badge:null},
+      {id:35, name:"Coque Demon Slayer",       series:"Kimetsu no Yaiba", cat:"coque",      price:8000,  emoji:"🔥", image:"image/coqueslayer.png",                          badge:null},
+      {id:36, name:"Coque Gojo Satoru",        series:"JJK",              cat:"coque",      price:8000,  emoji:"🔵", image:"image/coquegojo.png",                            badge:null},
+      {id:37, name:"Coque Eren Yeager",        series:"Attack on Titan",  cat:"coque",      price:8000,  emoji:"⚡", image:"image/coqueeren.png",                            badge:null},
+      {id:38, name:"Coque Attack on Titan",    series:"Attack on Titan",  cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquesnk.png",                             badge:null},
+      {id:39, name:"Coque Gon et Killua",      series:"HxH",              cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquegonetkillua.png",                     badge:null},
+      {id:40, name:"Coque Kakashi",            series:"Naruto",           cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquekakashi.png",                         badge:null},
+      {id:41, name:"Coque Naruto",             series:"Naruto",           cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquenaruto.png",                          badge:null},
+      {id:42, name:"Coque Solo leveling",      series:"Solo leveling",    cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquesololeveling.png",                    badge:null},
+      {id:43, name:"Coque Sung woo",           series:"Solo leveling",    cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquesungjinwoo.png",                      badge:null},
+      {id:44, name:"Coque Dan Da Dan",         series:"Dan Da Dan",       cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquedandadan.png",                        badge:null},
+      {id:45, name:"Coque Momo Ayase",         series:"Dan Da Dan",       cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquemomoayase.png",                       badge:null},
+      {id:46, name:"Coque Itachi",             series:"Naruto",           cat:"coque",      price:8000,  emoji:"🐉", image:"image/coqueitachi.png",                          badge:"Promo"},
+      {id:47, name:"Coque Dan Da Dan",         series:"Dan Da Dan",       cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquedandadan2.png",                       badge:null},
+      {id:48, name:"Coque Takakura",           series:"Dan Da Dan",       cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquetakakura.png",                        badge:null},
+      {id:49, name:"Coque Zenitsu",            series:"Kimetsu no Yaiba", cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquezenitsu.png",                         badge:null},
+      {id:50, name:"Coque Sangoku",            series:"Dragon ball",      cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquesangoku.png",                         badge:null},
+      {id:51, name:"Coque Hisoka",             series:"Hunter x Hunter",  cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquehisoka.png",                          badge:null},
+      {id:52, name:"Coque Gachiakuta",         series:"Gachiakuta",       cat:"coque",      price:8000,  emoji:"⚡", image:"image/coquegachiakuta.png",                      badge:null},
+    ];
+
+    function log(msg, type='info') {
+      const div = document.getElementById('log');
+      div.innerHTML += `<div class="${type}">${msg}</div>`;
+      div.scrollTop = div.scrollHeight;
+    }
+
+    window.startImport = async function() {
+      const btn = document.getElementById('btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Import en cours...';
+      log('🚀 Démarrage de l\'import...', 'info');
+
+      let success = 0;
+      let errors = 0;
+
+      for (const product of products) {
+        try {
+          const data = { ...product };
+          if (data.image === null) delete data.image;
+          if (data.badge === null) delete data.badge;
+          await addDoc(collection(db, 'produits'), data);
+          log(`✅ ${product.name}`, 'ok');
+          success++;
+        } catch (e) {
+          log(`❌ Erreur sur ${product.name}: ${e.message}`, 'err');
+          errors++;
+        }
+      }
+
+      log(`<br>🎉 Import terminé ! ${success} produits importés, ${errors} erreurs.`, 'info');
+      btn.textContent = '✅ Import terminé !';
+    };
+  </script>
+</body>
+</html>
