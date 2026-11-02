@@ -11,6 +11,8 @@
   const BF_TSHIRT_PRICE = 8000;
   // Fin de l'opération : dimanche 29 novembre 2026, 23h59 (UTC = Abidjan)
   const BF_END = new Date('2026-11-29T23:59:59Z').getTime();
+  // Arrêt automatique : après la date de fin, le site redevient normal tout seul.
+  if (Date.now() > BF_END) return;
  
   /* ---------- 1. STYLE ---------- */
   const css = `
